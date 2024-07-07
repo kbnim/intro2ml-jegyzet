@@ -1,0 +1,1989 @@
+\documentclass[a4paper, 11pt]{article}
+\usepackage[hungarian]{babel}
+\usepackage{t1enc}
+\usepackage[margin=2cm]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumerate}
+\usepackage[hidelinks]{hyperref}
+\usepackage{tcolorbox}
+\usepackage{stuki}
+\usepackage{stukicommands}
+\usepackage{tikz}
+\usepackage{forest}
+\usepackage{parskip}
+\usepackage{array}
+\usepackage{makecell}
+
+\renewcommand\theadalign{bc}
+\renewcommand\theadfont{\bfseries}
+\renewcommand\theadgape{\Gape[4pt]}
+\renewcommand\cellgape{\Gape[4pt]}
+
+\newcommand\norm[1]{\left\Vert#1\right\Vert}
+
+\newtheorem{theorem}{tétel}
+
+\title{\textbf{Bevezetés a gépi tanulásba}}
+\author{\textsc{Dr. Botzheim János}, \textsc{Gulyás László} és \textsc{Nagy Balázs} \\ magyar nyelvű előadásai alapján}
+\date{\textit{Utolsó frissítés: \today}}
+
+\begin{document}
+	
+\maketitle
+
+\section*{Előszó}
+
+Ez a jegyzet a 2023/2024/2. tavaszi félévben készült, mely a \textit{Bevezetés a gépi tanulásba} című tárgy \textbf{magyar nyelvű} előadásait dolgozza fel. Elsődleges forrásaim a levetített prezentációk voltak, valamint azon magyarázatok, melyek elhangoztak.
+
+A jegyzet \textit{a szó szoros értelmében jegyzet}nek minősül, azaz a magyarázatok messze nem olyan precízek, mint amilyeneket egy hivatalos egyetemi jegyzet megkövetelne, valamint a szerkezete is inkább vázlatpontokban foglaja össze tömören a lényeget. Emiatt \textbf{semmiképp sem helyettesíti az előadás anyagait}, legfeljebb egy áttekinthetőbb összefoglalást biztosít.
+
+Igyekeztem a legjobb tudásom szerint összeállítani a jegyzetet, ennek ellenére előfordulhatnak benne elgépelések, hibák, stb. Ha találsz ilyet, kérlek értesíts e-mailben a(z) \href{mailto:ap3558@inf.elte.hu}{ap3558@inf.elte.hu} címen.
+
+Sikeres felkészülést kívánok!
+
+%\textit{\today}
+
+\begin{flushright}
+	\textit{Kiss-Bartha Nimród}
+\end{flushright}
+
+\subsubsection*{Rövidítések}
+
+\begin{itemize}
+	\item \textbf{GT} -- gépi tanulás $\Longleftrightarrow$ ML -- machine learning
+	\item \textbf{MI} -- mesterséges intelligencia $\Longleftrightarrow$ AI -- artificial intelligence
+	\item \textbf{RL} -- megerősített tanulás (\textit{reinforcement learning})
+\end{itemize}
+
+\subsubsection*{Források}
+
+\begin{enumerate}[{[}1.{]}]
+	\item Az előadás prezentációi (\textit{Canvason elérhetők})
+	\item Valentinusz (Boda Bálint és mások) jegyzete (\textit{angol nyelvű}) [\href{https://github.com/Valentinusz/elte-ik-bsc/tree/main/5/ml/exam}{\texttt{link}}]
+	\item BME-s jegyzet (\textit{magyar nyelvű}) [\href{http://mnbprogram.bme.hu/wp-content/uploads/2021/10/1_2_3_Tanulmany_MelyMegerositesesTanulasAck.pdf}{\texttt{pdf}}]
+\end{enumerate}
+
+%\pagebreak
+
+\tableofcontents
+
+\newpage
+
+
+	
+\section{Mesterséges intelligencia vs. gépi tanulás -- Bevezető}
+
+\subsection{Mi az a gépi tanulás?}
+	
+\begin{itemize}
+	\item fogalmak tisztázása: $\boxed{\text{gépi tanulás (GT)} \neq \text{mesterséges intelligencia (AI)}}$
+	\item a két fogalom kapcsolódik egymáshoz, de nem ugyanarra vonatkoznak
+	\begin{itemize}
+		\item az MI sokkal régebbre nyúlik vissza (`50-es évek)
+		\item a GT frissebb, az MI-ből alakult ki 
+		\item (mondhatnánk, hogy $\text{GT} \subset \text{AI}$)
+		\item viszont mégis összekapcsolódnak, ugyanis jelenleg a \textbf{mély gépi tanulás} (\textit{deep machine learning}) uralja az MI-t
+	\end{itemize}
+\end{itemize}
+
+\subsection{Mióta létezik?}
+
+\begin{itemize}
+	\item 1956 óta vannak ilyen célú kutatások
+	\begin{itemize}
+		\item Dartmouth konferencia, ahol megjelentek az MI alapítói
+		\item azt kutaták, hogyan lehet mesterséges intelligenciát csinálni
+		\item másik szempontjuk, hogy hogyan lehet eladni
+		\item elnevezés: \textbf{mesterséges intelligencia} $\to$ marketing húzás (támogatók, szponzorok figyelmét felkeltsék vele)
+	\end{itemize}
+\item csak az elmúlt években robbant be a kutatási terület
+\begin{itemize}
+	\item a kutatások folyamatosak voltak '56 óta
+	\item csak az elért \textbf{eredményekről nem gondoljuk, hogy intelligensek}
+	\item a támogatás ``hullámzó'' volt (erről később)
+\end{itemize}
+\item felmutatható \textbf{eredmények}
+\begin{itemize}
+	\item GPS, navigáció $\leftarrow$ gráfkereső algoritmusok (BFS, DFS)
+	\item nyelvhelyesség-ellenőrző Wordben
+	\item postákon OCR (optikai karakterfelismerő) rendszerekkel szortírozzák a csomagokat már a '80-as évek óta (!)
+	\item szövegkikövetkeztető (text prediction)
+\end{itemize}
+\end{itemize}
+
+\subsection{Mik a hátráltató tényezők?}
+
+\begin{itemize}
+	\item mi az az \textbf{intelligencia}? $\to$ nincs univerzálisan elfogadott definíció
+	\begin{itemize}
+		\item olyan tulajdonság, amivel az ember rendelkezik\dots és mások?
+		\item egyetlen példából nehéz általánosítani
+		\item eddigi ``legjobb'' megfogalmazás: egy olyan \textbf{gép}, hogy $\boxed{\text{gép} + \text{digitalizáció} = \text{MI}}$
+	\end{itemize}
+	\item ezt a gépet az ember alkotja meg, hogy az \textit{jobbá} váljon az embernél (jobban teljesítsen feladatokat nála)
+	\begin{itemize}
+		\item mit jelent, hogy \textit{jobban teljesítsen}?
+		\item pontosabban? gyorsabban? olcsóbban?
+		\item ilyen értelemben a varrógép is mesterséges intelligencia\dots ez kicsit kiábrándító
+	\end{itemize}
+	\item a legtöbbször úgy épülnek be az életünkbe ezek az ``intelligens'' dolgok, hogy fel sem tűnik a létük
+	\begin{itemize}
+		\item mintha egy közmű lenne
+		\item pl. az elektromosság megjelenésekor mindenki démonizálta az új technológiát, 100 évvel később anapság akkor pánikolunk, amikor nincs áram
+		\item hasonló érzelmek / gondolatok forognak az MI körül is
+	\end{itemize}
+\end{itemize}
+
+\subsection{Az MI értelmezése}
+
+\begin{enumerate}[A)]
+	\item \underline{Szűk MI (\textit{narrow AI})}:
+	\begin{itemize}
+		\item jelenlegi korunk
+		\item adott feladatot (feladatcsoportot) jobban csinál, mint az ember
+		\item ekkor a szűk értelmezésben intelligensnek nevezhetők
+	\end{itemize}
+	\item \underline{Általános MI (\textit{AGI -- artificial general intelligence})}
+	\begin{itemize}
+		\item felülmúlja az emberi intelligenciát
+		%\item hasonlóan általános, mint az ember
+		\item minden feladatot képes elvégezni
+	\end{itemize}
+	\item Egyéb elméleti koncepciók: 
+	\begin{itemize}
+		\item szingularitás: fel sem tudjuk fogni a fejlődés mértékét (irodalmi művekből ered a fogalom)
+		\item szuperintelligencia
+		\item öntudatra ébredés ($\to$ mi az az \textit{öntudat}?)
+	\end{itemize}
+\end{enumerate}
+
+A \textbf{vita} arról szól, hogy \textit{még nem} vagy \textit{már} eljutottunk-e az AGI-ba? Ennek eldöntésére \textbf{tesztek}et állítottunk elő.%\footnote{A Wikipédián lehet találni még jó pár tesztet részletesebb leírással.}
+
+\begin{enumerate}
+	\item \underline{Turing-teszt}:
+	\begin{itemize}
+		\item ha lehet vele beszélgetni egy interfésze keresztül úgy, hogy 30 perc eltelte után nem tudjuk eldönteni, hogy ember-e vagy gép $\to$ a gép intelligens
+		\item eredmény: elértük
+		\item ChatGPT átmenne a teszten (szigorú értelemben nem, mert ha megkérdezzük tőle, hogy ő ember-e vagy gép, (egyelőre) gépet fog mondani)
+	\end{itemize}
+	%\newpage
+	\item \underline{Robot hallgató-teszt}:
+	\begin{itemize}
+		\item (mármint egyetemi diák)
+		\item beíratjuk egy egyetemre; ha lediplomázik, mint egy hallgató $\to$ a gép intelligens
+		\item eredmény: egyesek átmentek rajta
+	\end{itemize}
+	\item Employment test
+	\begin{itemize}
+		\item állást kereső robot; ha felveszik $\to$intelligens
+		\item nehéz tesztelni
+	\end{itemize}
+	\item Egyéb tesztek:
+	\begin{itemize}
+		\item IKEA-teszt: ha össze tud rakni egy IKEA-s bútort, akkor intelligens
+		\item Kávé-teszt: ha tud készíteni kávét, akkor intelligens
+		\begin{itemize}
+			\item a trükk a feladatban megvúvó komplexitás
+			\item sok a be nem számítható változó (polc magassága, hol találja a kávét, ismeri-e a kotyogós használatát, stb.)
+			\item nem sikerült elérni semminem / senkinek
+		\end{itemize}
+	\end{itemize}
+\end{enumerate}
+
+Praktikus dolgokban alulmaradnak, az ember jobb bennük.
+
+\subsection{Az MI történelme}
+
+\begin{itemize}
+	\item hullámokban érkeztek / érkeznek a fejlődések
+	\item megoszlanak a nézetek, hány hullám volt / van
+	\item kutatáspromócióra tökéletesen használható a terület ezen természete
+	\begin{center}
+		1956-ban megszületik az \textbf{MI}, mint fogalom
+		
+		$\Downarrow$
+		
+		hatalmas \textbf{támogatás}, érdeklődő hallgatók
+		
+		$\downarrow$
+		
+		de \textbf{nem} jelentek meg hasznosnak, \textit{intelligens}nek \\ minősülő eredmények $\to$ az \textit{első MI tél}
+	\end{center}
+	\item 5-10 évvel később: fiatalabb kutatók újabb ötletekkel érkeztek
+	\begin{itemize}
+		\item mantra: ``\textit{az első társaság rosszul csinálta, de mi tudjuk}''
+		\item ugyanúgy elbuktak
+	\end{itemize}
+	\item most úljabb felfele ívelés tapasztalható
+	\item  a régebbi eredmények sosem tűntek el, csak nem MI-ként gontolunk rájuk (\textit{ld. korában})
+	\item utolsó hullám eleje:
+	\begin{itemize}
+		\item 2000-2001. -- felismerték, hogy hétköznapi tudásra, ``\textit{józan észt}'' igénylő feladatok megoldására, trivialitások felismerésére nem alkalmas
+		\item gondolat: ``\textit{ha meggondoljuk, a csecsemő és a gyerek is ezeket a trivialitásokat tanulja meg, amíg fel nem nő}''
+		\item projekt: Open Mind Common Sense
+		\begin{itemize}
+			\item az általános tudásunknak, a \textit{józan ész}nek az adatbázisa
+			\item ilyeneket tartalmazott, pl. \textit{az anyám anyja a nagyanyám}
+		\end{itemize}
+		\item minek összegyűjteni ezeket, ha ott az \textbf{internet}?
+		\begin{center}
+			$\Downarrow$ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			
+			ezt felhasználva kapjuk meg a \textbf{gépi tanulás}t $\to$ elérkeztünk napjainkig
+		\end{center}
+	\end{itemize}
+\end{itemize}
+
+\newpage
+	
+\section{Napjaink MI-je -- Optimalizáció}
+
+Az előadás tételmondata: az MI-kutatás (legtöbb) feladata az \textbf{optimalizáció}ról szól.
+	
+\subsection{Mitől optimalizáció?}
+	
+\begin{itemize}
+	\item példa: $f^* = \arg\max\limits_{x\in X}f(x)$
+	\item feladat: keressük azt az modellt, aminek a paramétereit (\textbf{súlyait}, jele $w \in W$) \textbf{a legjobban állítom be}, a legjobban teljesít \\ általában minimumot keresünk
+	\item \fbox{jó = minimumtól való eltérés kicsi}
+	\item $\boxed{f^* = \arg\min\limits_{w \in W}^{} f(w, x)}$ (ahol $w$ a tanult paraméterek és $x$ a bemeneti példányok)
+	%\item súlyok helyes beállítása
+	\item valahol könnyebben látszik, valahol nehezebben látszik az optimalizáció (problémamegoldás) \\ pl. legrövidebb $A$-ból $B$-be vezető út (lehetséges jelentései: legrövidebb számú lépéssorozat, legrövidebb úthossz, legrövidebb idő)
+\end{itemize}
+
+\subsection{Intelligens viselkedés}
+
+Tipikus feladatok, amiket ha képes megoldani, intelligensként tekintünk rá.
+
+\begin{enumerate}[A)]
+	\item \underline{Tervezés}
+	\begin{itemize}
+		\item adott bizonyos lépések elvégzésének egy sorrendje $\to$ cél:
+		\begin{itemize}
+			\item hogy a legtöbbet gyártsuk
+			\item hogy a legnagyobb legyen a haszon
+		\end{itemize}
+		%\item felmerülő problémák -- példán keresztül: gyári termékgyártás üzemeltetése
+		%\begin{itemize}
+			%\item eltérő követelmények az eszközöket illetően
+			%\item eltérők a gyártandó termékek
+			%\item váratlan események 
+		%\end{itemize}
+		\item ha nem triviálisan kicsi a feladat, nem várhatjuk el, hogy az MI jobban teljesítsen
+	\end{itemize}
+	\item \underline{Kép- / hang- / szövegfelismerés}
+	\begin{itemize}
+		\item pl. ismerje fel, hogy milyen betűt ábrázol a rajz
+		\item megadunk egy \textbf{veszteségfüggvény}t / \textbf{hibafüggvény}t $\to$ cél: az ettől való eltérés minimalizálása
+	\end{itemize}
+	\item \underline{Tanulás}
+	\begin{itemize}
+		\item kulcs: \textbf{fejlődés} (minden egyes iterációnál váljon jobbá a korábbi iterációhoz képest)
+		\item pl. \textit{darts célbadobása}: ha nagyon magasan van, vigye lejjebb, ha túl balra dob, jobbrább kell tolnom $\Longrightarrow$ \textbf{paraméterek finomhangolása}
+		\item találja el a célpontot $\to$ vizsgálja meg az eredményt $\to$ változtasson a paramétereken (váljon jobbá)
+		\item szintén, a célunk
+		\begin{itemize}
+			\item hiba minimalizálása
+			\item pontosság maximalizálása
+		\end{itemize}
+		\item feladat: határozzuk meg, hogy \textit{a hibafüggvény az adott helyen hogyan fog változni}
+		\begin{center}
+			$\Downarrow$
+			
+			\textbf{gradiens}, \underline{\textbf{deriválás}}
+		\end{center}
+		\newpage
+		\item \textbf{gépi tanulás osztályai}
+		\begin{enumerate}[(a)]
+			\item  \underline{Felügyelt tanulás} (\textit{supervised learning})
+			\begin{itemize}
+				\item tudjuk a jó választ
+				\item az MI eredményét összehasonlíthatjuk vele (jó-e vagy sem, mennyire jó, stb.)
+				\item \textit{előfeltétel}: álljon a rendelkezésünkre sok példa / adat, amik meg vannak címkézve (\textbf{címkézett adat}) $\to$ ez a súlyállítgatás miatt fontos
+			\end{itemize}
+			\item  \underline{Felügyelet nélküli tanulás} (\textit{unsupervised learning})
+			\begin{itemize}
+				\item címke nélküli adatunk van
+				\item ``\textit{majd meglátjuk}'' alapon derül ki a képessége
+				\item pl. a '70-es évek óra így működtek a karakterfelismerő rendszerek $\to$ \textbf{klaszterezés}sel megállapítja, mennyire hasonlítanak
+				\item van, hogy mi adjuk meg, hány csoportba rendezze a bemeneteket (pl. számjegyek esetén 10-et), VAGY rábízzuk, hogy saját maga fedezze fel ezeket a csoportokat
+				\\ \textit{lehetséges probléma}:  a 9-es és a 6-os számjegyet azonosnak veszi
+			\end{itemize}
+			\item  \underline{Megerősítéses tanulás} (\textit{reinforcement learning})
+			\begin{itemize}
+				\item régi ötletről van szó
+				\item próbálja meghaladni a felügyeletet
+				\item nincs címke, és adat sem igazán $\to$ helyette \textbf{visszacsatolás} van
+				\item ha a visszacsatolás szerint helyes az eredmény, \textbf{jutalom}ban részesül (\textit{reward})
+				\item ``\textit{próba-szerencse}'' (\textit{trial and error}) alapjú
+				\item példa: $\alpha_0$ sakkjáték
+			\end{itemize}
+		\end{enumerate}
+		\item \textit{megjegyzés}: a tanulás \textbf{\textit{lassú folyamat}}
+		\begin{itemize}
+			\item felügyelt és megerősített tan.: sok számítás és futtatás
+			\item felügyeletlen tan.: valamivel kevesebb
+			\item ha meggondoljuk, az emberek is lassan tanulnak
+		\end{itemize}
+	\end{itemize}
+	\item \underline{Valami új generálása}
+	\begin{itemize}
+		\item a tanulás alkalmazása a szoftver generatív aspektusában (Dall-E, ChatGPT, stb.)
+		\item az alábbi gondolatok álnak mögötte
+		\begin{enumerate}[(a)]
+			\item \underline{Önkódoló rendszerek} (\textit{autoencoders})
+			\begin{itemize}
+				\item az alábbiakra van szükségünk:
+				\begin{itemize}
+					\item adott egy bemenet és egy kimenet: $\boxed{in, out \in \mathbb{R}^D}$
+					\item kódolós (\textit{encoding}): $\boxed{f : \mathbb{R}^D \to \mathbb{R}^d}$, ahol $d \ll  D$ \footnote{Jelentése: sokkal kisebb a dimenzionalitása $d$-nek $D$-hez képest}
+					\item dekódolás (\textit{decoding}): $\boxed{g : \mathbb{R}^d \to \mathbb{R}^D}$
+					\item generatív kimenet (geverative output): $\boxed{g(y)}$, ahol $y \in \mathbb{R}^d$ tetszőleges (random)
+				\end{itemize}
+				\item \textit{az ötlet mögötte}: van egy óriási dimenzionalitású adatunk $\to$ a kódoló $f$ függvénnyel lecsökkentjük a dimenzionalitását $\to$ az így kapott eredményt dekódoljuk a $g$-vel, hogy a bemenetivel azonos dimenzionalitású eredményt kapjunk
+				\item \textit{cél}: úgy kódoljuk át a bemenetet, hogy az eredeti bemenet ``jellegzetességeit'' megőrizze
+				\item olyan, \textit{mint} a JPEG tömörítő algoritmusa; hogy az ember számára nem látható részleteket eliminálja a képből, ezzel csökkentve a fájlméretet
+				\item \textit{eredmény}: minél jobbak a leképezőfüggvényeink, annál jobban fog hasonlítani a végeredmény az eredeti bemenetre
+				\item pl. arc generálása, javító algoritmusok
+				%\item előnyös megközelítés, de vannak hátrányai
+			\end{itemize}
+			%\newpage
+			\item \underline{GAN -- \textit{generative adversarial network}}
+			\begin{itemize}
+				\item lehetséges magyar fordítása: generatív ellenféli hálózat
+				\item példán keresztül szemléletve: adott két MI
+				\begin{itemize}
+					\item az egyiknek ($A$ vagy \textbf{generátor}) a feladata: tanulja meg, hogyan kell bankjegyet hamisítani
+					\item a másiknak ($B$ vagy \textbf{diszkriminátor}) a feladata: tanulja meg felismerni a hamis bankjegyeket
+					\item a két modell interakcióban van egymással
+					\item kezdetben az $A$ szörnyen teljesít, így a $B$-nek könnyű dolga van
+					\item ahogy $A$ egyre fejlődik, úgy válik $B$-nek a feladata nehezebbé
+					\item ezt a módszert \textbf{generátor-diszkriminátor modell}nek is hívják
+				\end{itemize}
+			\end{itemize}
+		\end{enumerate}
+	\end{itemize}
+\end{enumerate}
+
+\subsection{Mitől nehéz az optimalizáció?}
+
+\begin{itemize}
+	\item $\boxed{f^* = \arg \min_{w \in W}^{~} (w, x)}$ -- jellemzően $W \subseteq \mathbb{R}^N$, ahol $N > 10^6$
+	\item azaz \textit{hatalmas a dimenzionalitás}, amivel dolgoznunk kell
+	\begin{itemize}
+		\item nem egyértelmű, melyik súlyt finomhangoljuk
+	\end{itemize}
+	\item nem gyakran folytonos / deriválható / monoton $\to$ csúnya függvények
+	\begin{itemize}
+		\item más szóval ``rücskös'' függvények (\textit{rugged functions})
+		\item nem alkalmazhatók a jól ismert tteleink analízisból $\to$ nincs esélyünk megtalálni az egzakt szélsőértékeit
+		\item ezért \textbf{közelítenünk kell felé}
+	\end{itemize}
+\end{itemize}
+
+\subsection{Hogyan próbálkozhatunk?}
+
+\begin{itemize}
+	\item a biológiából, a természetből inspirálódunk $\to$ \textbf{matematikai modellek}
+	%\item olyan \textbf{matematikai modellek}et állítunk fel, melyek kellőképpen modellezik egy adott biológiai konstrukció működését
+	\begin{enumerate}[A)]
+		\item agy $\to$ \textbf{mesterséges neurális hálók} (\textit{artificial neural networks})
+		\item evolúció $\to$ \textbf{evolúciós algoritmusok} (\textit{evolutionary algorithms})
+		\item társas rovarok $\to$ \textbf{rajintelligencia} (\textit{swarm intelligence methods})
+	\end{enumerate}
+	\item róluk később bővebben lesz szó
+\end{itemize}
+
+\newpage
+
+\section{Felügyelt tanulás}
+
+Más fordítások: ellenőrzött tanulás.
+
+\subsection{Felügyelet nélküli tanulás -- visszatekintés}
+
+\begin{itemize}
+	\item nagy adathalmaz $\to$ megpróbál hasonlóságokat és különbségeket észrevenni $\to$ csoportosítás, klaszterezés
+	\item nincs visszacsatolás a környezettől, nincs (számszerű) visszajelzés
+\end{itemize}
+
+\subsection{Felügyelt tanulás}
+
+\begin{itemize}
+	\item van egy ``tanító'', azaz az \textbf{adataink meg vannak címkézve}, ami egyfajta visszajelzésül szolgál
+	\item pl. \textbf{hagyományos számítógépes programozás} %-- \framebox{computer(input, program) : output}
+	
+	\begin{stuki*}[8cm]{Computer($i : Input$, $p : Program$) : $Output$}
+		\stm{\texttt{/* operations */}}
+		\stm{\textbf{return} ~ o : Output}
+	\end{stuki*}
+	
+	\item ehhez képest a \textbf{felügyelt tanulás}%: \framebox{computer(input, output) : program}
+	
+	\begin{stuki*}[8cm]{Computer($i : Input$, $o : Output$) : $Program$}
+		\stm{\texttt{/* operations */}}
+		\stm{\textbf{return} ~ p : Program}
+	\end{stuki*}
+	
+	\item emberibb példa: ``\textit{mit csinál a gép}'' feladattípus (2. osztályból) $\to$ a programra kell rájönni, ahol ismerjük a bemenetet és a kimenetet
+	\item \textbf{felügyelet nélküli tanulás}: a visszacsatolás hiányzik (címkeinformáció) $\to$ sokkal nehezebbnek tűnik %-- \framebox{computer(input) : program $\times$ output}
+	
+	\begin{stuki*}[8cm]{Computer($i : Input$) : $Output \times Program$}
+		\stm{\texttt{/* operations */}}
+		\stm{\textbf{return} ~ op : Output \times Program}
+	\end{stuki*}
+\end{itemize}
+
+\subsection{A tanulás típusai}
+
+\begin{itemize}
+	\item \textbf{tanulás}: saját teljesítményünk fejlesztése megfigyelések alapján
+	Machine Learning
+	\item \textbf{gépi tanulás}: az MI ``\textit{részhalmaza}'', a számítógépes rendszerek a megfigyelendő adatokban található mintákból tanul
+	\item  \underline{tanulási feladatok}
+	\begin{itemize}
+		\item \textbf{klasszifikáció} (osztályozás): ahol egy véges halmaz a kimenet
+		\item \textbf{regressziós} : $\mathbb{R}$ ahol a kimenet egy numerikus predikció, (numerikus) feladat
+	\end{itemize}
+	\item (2. osztályos példa) hogyan jövünk rá a programra / az algoritmusra? $\to$ mintát fedezünk fel a bemenet és kimenet között ÉS / VAGY próbálkozunk (és ezt optimalizáljuk)
+	\item a hiba segítségével lehet irányítani a tanítást $\to$ modell (függvény) $\Longrightarrow$ távolságfüggvény
+\end{itemize}
+
+\subsection{Mi az a felügyelt tanulás?}
+
+%Formális definíció:
+
+\begin{tcolorbox}
+	Adott egy $N$ darabból álló \textbf{tanító adathalmaz} (\textit{training data set}), mely \[ (x_1,y_1), (x_2,y_2), \dots, (x_N, y_N) \] bemeneti-kimeneti párokból áll, melyeket egy ismeretlen $y = f(x)$ függvény generált. A feladat, hogy fedezzük fel a $h$ függvényt (\textbf{hipotézis}t -- modellt), ami az igazi $f$ függvényt közelíti.
+\end{tcolorbox}
+
+\begin{itemize}
+	\item adottak bement-kimenet párosak: $x_1^{(p)}, \dots, x_n^{(p)}, d^{(p)}$
+	\item $p$: a minták száma, $n$-dimenziós bemenet, skaláris kimenet
+	\item $x$ vektor $\to$ rendszeren és modellen keresztül $\to$ $d$ és $y$ 
+	\begin{center}
+		\includegraphics[scale=0.3]{ea_ppt/03_SupervisedLearning}
+	\end{center}
+	\item a hiba vezérli a tanulást, és a hibát onnan tudjuk, hogy ismerjük a helyes kimenetet
+	\item sokféle tanítási módszer létezik
+	\item szemléletes példa: $(x,y)$ pontpárokat adunk meg $\to$ találjunk egy függvényt, ami átmegy ezeken a pontokon
+	\begin{center}
+		\includegraphics[scale=0.5]{img/ea03_function_approx}
+	\end{center}
+	\item mi a baj ezzel a megközelítéssel? $\to$ túl specifikus az eredmény, más bemenet esetén nem lesz jó az eredményünk
+	\item adathalmaz / tanítóminta -- ne csak egy adott adatszettre illeszkedjen rá $\to$ \textbf{legyen jó az általánosítóképessége}
+\end{itemize}
+
+\subsection{Problémák}
+
+\begin{itemize}
+	\item alulilleszkedés: túl egyszerű a modell, így nem jó az általánosító képessége
+	\item túlilleszkedés: túl specifikus, szintén nem kezeli jól a tesztadatot
+\end{itemize}
+
+\subsection{Döntési fák}
+
+\begin{itemize}
+	\item fák egyes csúcsaiban egyes helyzetek vannak, ahol az élek egyes döntéseket jelentenek
+	\item egy logikai döntési fára gondolhatunk így is:
+	\[ Output \Longleftrightarrow (Path_1 \lor Path_2 \lor \dots) \] ahol az egyes $Path$ok (fagráfon utak) a gyökérből az egyes levelekbe vezető utakat jelölik (tehát, hogy igaz vagy hamis döntésre jutottunk az egyes lépéseket követően)
+	\item pl. éttermi várakozási probléma
+	\begin{itemize}
+		\item rengeteg szempont felsorolva, mindegyikhez tartozhat néhány eset
+		\item a szerzők felállítottak egy döntési fát erre a szituációra
+		
+		\begin{center}
+			\includegraphics[scale=0.5]{img/ea03_decision_tree_idea}
+		\end{center}
+		
+		\item mit csináljon, ha vannak információink nemcsak az inputról, hanem az outputról?
+		\item az attribútumminták alapján hogyan tudunk felépíteni egy fát?
+		\begin{center}
+			\includegraphics[scale=0.5]{img/ea03_decision_tree_outcomes}
+		\end{center}
+		\item eddig csak kézzel építettünk fel, most automatizáljuk a folyamatot
+		\item precedenciát állítunk fel az attribútumok alapján; azaz lesznek fontosabb attribútumok (szempontok), amik előnyt élveznek a többivel szemben
+		\begin{center}
+			\includegraphics[scale=0.5]{img/ea03_decision_tree_subproblems}
+		\end{center}
+		\item mikor fontosabb egy attribútum, ha jobban szeparálja az eseteket
+		\item ezt az algoritmust rekurzíve meghívjuk és így építjük fel a fát $\to$ optimélis lesz az bemeneti adathalmaz szempontjából, megkapjuk, hogy optimálisan hogy jutunk el a legrövidebb úton a fa gyökeréből a csúcsba
+		
+		\begin{center}
+			\includegraphics[scale=0.5]{img/ea03_decision_tree_computer_generated}
+		\end{center}
+	\end{itemize}
+	\item \underline{előnyei}
+	\begin{itemize}
+		\item könnyű megérteni
+		\item hatalmas adathalmazra is jól kiterjeszthető (scalability)
+		\item rugalmasan kezeli a véges és folytonos adatokat
+		\item klasszifikáció és regresszió egyszerre
+	\end{itemize}
+	\item \underline{hátrányai}
+	\begin{itemize}
+		\item szuboptimális pontosság (főleg a mohó keresés miatt)
+		\item ha a fa mély, egy új előrejelzés nagyon költséges lehet egy új példánál
+		\item a döntési fák instabilak -- egyetlen új példa hozzáadása a teljes fát megváltoztathatja
+	\end{itemize}
+\end{itemize}
+
+\subsection{Regresszió}
+
+\begin{itemize}
+	\item feladat: egy lineáris függvényt hogyan illeszthetünk rá egy adathalmazra
+\end{itemize}
+
+\begin{minipage}{0.33\linewidth}
+	\begin{center}
+		\includegraphics[scale=0.25]{img/ea03_regression/01}
+	\end{center}
+\end{minipage}
+\begin{minipage}{0.33\linewidth}
+	\begin{center}
+		\includegraphics[scale=0.25]{img/ea03_regression/02}
+	\end{center}
+\end{minipage}
+\begin{minipage}{0.33\linewidth}
+	\begin{center}
+		\includegraphics[scale=0.25]{img/ea03_regression/03}
+	\end{center}
+\end{minipage}
+
+\newpage
+
+\section{Neurális hálózatok}
+
+\subsection{Biológiai és mesterséges neuronok}
+
+\subsubsection{Biológiai neuronok}
+
+\begin{itemize}
+	\item a biológiából jött a motiváció -- ha ott működik, miért ne működne gépeknél is?
+	\item \textbf{emberi idegrendszer}: egy nagyon összetett rendszer
+	\begin{itemize}
+		\item \textit{feladatai}: emlékezés, gondolkozás, problémamegoldás, döntéshozatal, stb.
+		\item \textit{neuron}: jeleket kap meg más neuronoktól és ezeket kombinálja
+		\begin{itemize}
+			\item egy baba az agyában $10^{11}$ db. neuronnal születik
+			\item egy neuron kb. 1000 neuronhoz van hozzácsatlakoztatva $\to$ $10^{14}$ db. kapcsolat \\ (vagy él, ha gráfos szempontból közelítjük meg)
+			\item az emberi memóriakapacitás: 1 és 1000 TB között
+		\end{itemize}
+		\item ezek a jelek a \textit{dendrit}ek mentén haladnak
+		\item ha a jel elég erős $\to$ kimeneti jel az \textit{axon}on keresztül más neuronokhoz
+	\end{itemize}
+	\item felépítése
+	\begin{itemize}
+		\item neuronok (idegsejtek) -- $10^{11}$ darab van belőlük
+		\item átlagosan 100 összeköttetés per idegsejt $\to$ 100 billió összesen
+		\item sejttest $\to$ információ $\to$ axon
+	\end{itemize}
+\end{itemize}
+
+\subsubsection{Mesterséges neuronok}
+
+\begin{itemize}
+	\item az emberi agy és a számítógép összehasonlítása
+	\begin{center}
+		\begin{tabular}{|l|c|c|}
+			\hline
+			& \textbf{Számítógép} & \textbf{Emberi agy} \\
+			\hline
+			\textit{Sebesség} & 4 GHz felett & 40-50 Hz \\
+			\hline
+			\textit{Működési mód} & sorosan (lineárisan) & párhuzamosan \\
+			\hline
+			\textit{Ember felismerése} & bonyolult & könnyű\footnote{(A párhuzamosságnak köszönhetően.)} \\
+			\hline
+		\end{tabular}
+	\end{center}
+	\item az idegrendszernek egy egyszerűsített modelljét használjuk fel az MI-ben is
+	\item \textbf{mesterséges neuron}: a bemenetek $n$-dimenziós \textit{vektorok} ($(x_1, \dots, x_n)$, ezek a), melyek \textit{súlyok}kal rendelkeznek ($(w_1, \dots, w_n)$), melyeket egy $v$ értékben ``összeadó csomópontban'' (\textit{summing junction}) számszerűsítünk. Ezeket átadjuk egy $\Phi$ függvénynek, ami visszaalakítja olyan formátumúvá, hogy bemenetként fel tudják használni más neuronok
+	\[ \big( (x_1,w_1), \dots, (x_n, w_n) \big) =: \textbf{v} \mapsto \Phi(\textbf{v}) := (y_1, \dots, y_n) \]
+	\begin{itemize}
+		\item önmagukban csak egyszerű feladatok megoldására képesek
+		\item viszont ha elég sokat használunk fel belőlük, melyek össze vannak kötve egymással, képesek komplex feladatokat is megoldani
+		\item $\Phi$ -- \textbf{aktivációs függvény}: a kimenetet két aszimptota között korlátozza le, hogy a neuronok egy ésszerű, dinamikus intervallumon belül legyenek értelmezve \\ Tipikusan \textbf{lépcsős} (\textit{step function}) vagy \textbf{szigmoid függvény} (\textit{sigmoid function}) szokott lenni.
+		\begin{figure}[h!]
+			\centering
+			\includegraphics[scale=0.35]{img/04/activation_function}
+			\caption{Lépcsős és szigmoid függvény}
+		\end{figure}
+	\end{itemize}
+\end{itemize}
+
+\subsection{Egyrétegű perceptronok}
+
+\begin{itemize}
+	\item Rosenblatt vezette be 1958-ban, ez volt az első modell felügyelt tanulásra
+	\item a McCulloch--Pitts-modellen alapult 
+	\item feladat: lineárisan szétválasztja (szeparálja) $\Longrightarrow$ \textbf{osztályozza az adathalmazt}
+	\item előfeltétel: az adat legyen \textbf{lineárisan szeparálható}
+	\item ezen limitáció miatt elapadt a lelkesedés iránta, de a '80-as években ismét elkezdtek érdeklődni a kutatók (napjainkban is fontosak)
+	\item ennek továbbfejlesztett változata a \textit{többrétegű perceptronok}, melyek lineárisan nem szeparálható mintákat is képesek csoportosítani
+\end{itemize}
+
+\subsubsection{Lineáris szeparabilitás}
+
+\begin{itemize}
+	%\item feladat: lineárisan szétválasztja (szeparálja) $\Longrightarrow$ \textbf{osztályozza az adathalmazt}
+	\item Matematikai jelentése: \textbf{szerkesszünk egy hipersíkot, amely kettéválasztja az adatokat úgy, hogy egy adat pontosan egy csoportba tartozhat} (függvény grafikonja felett vagy alatt)
+	\item Megjegyzés: kétdimenziós adatok esetén egyenest, $n$-dimenziós adathalmaz esetén $(n-1)$-dimenziós hipersík lesz a szeparátorunk
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[scale=0.125]{img/04/separating_hyperplanes}
+		\caption{A $H_1$ hipersík nem választja szét az adathalmazt, míg a $H_2$ és $H_3$ igen.}
+	\end{figure}
+	\item Példa: vegyünk két bemenetet: $(x_1,x_2)$ 
+	\begin{itemize}
+		\item Megadhatunk-e rá egy szétválasztó egyenest? %~~~ $-w_0 + x_1 w_1 + x_2 w_2 = 0$
+		\[-w_0 + x_1 w_1 + x_2 w_2 = 0\]
+		\item A perceptronok paramétereit \textbf{súlyok}nak (\textit{weights}) hívjuk: $w_1, w_2, \dots$
+		\item Mi az egyenlete? %~~~ $x_2 = - \dfrac{w_1}{w_2} x_1 + \dfrac{w_0}{w_2}$
+		\[x_2 = - \dfrac{w_1}{w_2} x_1 + \dfrac{w_0}{w_2}\]
+	\end{itemize}
+\end{itemize}
+
+\subsubsection{Logikai kapuk}
+
+\begin{itemize}
+	\item Tipikusan kétváltozós, McCulloch-Pitts perceptronokkal megoldható feladat a logikai kapuk implementációja
+	
+	\item A \textbf{logikai függvények} (\textit{boolean functions}), mint a $\land$ (AND), $\lor$ (OR) és a $\neg$ (NOT) jól szeparálhatók lineárisan.\footnote{\textbf{\textit{Megjegyzés}}. Összesen $2^4 = 16$ darab logikai függvény van, viszont a felsorolt 3-ból ($\land$, $\lor$ és $\neg$) kirakhatjuk az összes többit is.}
+	\item Mindegyik függvényre vannak bemeneteink: $in_1$ és $in_2$, valamint egy $out$ kimenet, melyekhez meg kell határoznunk a súlyokat és a küszöbértéket
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[scale=0.225]{img/04/logical_gates_01}
+	
+		\caption{A NOT, AND és OR függvények implementációja}
+	\end{figure}
+	
+	%Az AND függvényre a kimenet így kapható meg:\[ out = sgn(w_1 \cdot in_1 + w_2 \cdot in_2 - \theta). \]
+	%A súlyok az ábrán az élek melletti értékek. A küszöbérték: $\theta = 0,5$.
+	
+	\item Vannak azonban olyan függvények, amelyekhez kézzel nem szerkeszthetünk ilyen hálózatot. Ilyen például az XOR
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[scale=0.225]{img/04/logical_gates_02}
+		
+		\caption{Az XOR-hoz nem tudunk megfelelő súlyokat megadni}
+	\end{figure}
+
+	\item Mindegyik \textbf{tanítóminta} (\textit{training pattern}) lineáris egyenlőtlenségeket állít elő a kimenet számára, melyek a hálózat bemeneteiből és a hálózat paramétereiből állnak $\to$ ebből kiszámíthatjuk a súlyokat és a küszöbértéket
+	\item A következő egyenlőséget kell kielégítenie: \[ out = sgn(w_1 \cdot in_1 + w_2 \cdot in_2 - \theta). \]
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[scale=0.225]{img/04/logical_gates_03}
+		\caption{Az AND-hez tartozó egyenlőtlenségrendszer}
+	\end{figure}
+	\item Láthatjuk, hogy \textbf{végtelen sok megoldás}unk lehet. Hasonló igaz ez a NOT-ra és az OR-ra is.
+	\item Ha a fenti egyenlőtlenséget elvégezzük az XOR-ra $\to$ a 2. és a 3. ellent mond a 4. egyenlőtlenséggel, így \textbf{nincs megoldása a feladatnak} (hátránya a perceptronoknak)
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[scale=0.225]{img/04/logical_gates_04}
+		
+		\caption{Az AND-hez tartozó egyenlőtlenségrendszer}
+	\end{figure}
+	\item komplexebb hálózatokra lenne szükségünk, vagyis olyanokra, melyek több kisebb hálózatot kombinálnak; vagy egy másik aktivációs függvényt kellene használnunk
+	\item akárhogy is, bonyolultabbá válik a küszöbérték és a súlyok meghatározása papíron
+\end{itemize}
+
+\subsection{Perceptronok tanítása}
+
+\begin{itemize}
+	\item angolul: \textbf{training of perceptro}ns (itt: \textit{tanítás}, esetleg \textit{kiképzés})
+\end{itemize}
+
+A perceptronok tanításának algoritmusa.
+
+\begin{enumerate}[I.)]
+	\item \underline{Inicializáció}
+	\begin{itemize}
+		\item állítsuk be a kezdeti értékeit a \textbf{súlyok}nak: $w_1, w_2, \dots, w_m$
+		\item állítsunk be egy $\theta$ \textbf{küszöbérték}et egy random számra a(z) $\theta \in \left[ - \dfrac{1}{2}, \dfrac{1}{2} \right]$ intervallumból
+		\item állítsuk be a $\eta$ \textbf{tanulási rátá}t egy pozitív számra úgy, hogy $\eta < 1$
+	\end{itemize}
+	\item \underline{Aktiváció}
+	\begin{itemize}
+		\item számítsuk ki a $p$-edik iteráció \textbf{tényleges kimenet}ét
+		\[ y = \Phi \left( \sum\limits_{i = 1}^{m} x_i \cdot w_i \right) \]
+		\item aktivációs függvény: \textbf{küszöbérték / lépésfüggvény} (vagy előjelfüggvény)
+		\[ y(p) = step \left[ \left( \sum\limits_{i = 1}^{m} x_i \cdot w_i \right) - \theta \right] \]
+	\end{itemize}
+	\item \underline{Súlyok tanítása}: a perceptronok súlyainak frissítése
+	\begin{itemize}
+		\item új súlyok: \[ w_i(p+1) = w_i(p) + \Delta w_i(p) \]
+		\item súlykorrekció: \[ \Delta w_i(p) = \eta \cdot x_i(p) \cdot e(p) \]
+		\item hiba (\textit{error}): \[ e(p) = d(p) - y(p) \]
+	\end{itemize}
+	\item \underline{Iteráció}: inkrementáljuk egyesével a $p$-t, térjünk vissza a II. lépéshez és ismételjük a folyamatot a konvergenciáig
+\end{enumerate}
+
+Példa az algoritmusra: \framebox{perceptronok tanítása a logikai ``és'' műveletére} .
+
+\newpage
+
+\begin{figure}[h!]
+	%\centering
+	Az epochnak 4 lehetséges bemeneti mintája van: \[ 00,~01,~10,~11. \]
+	
+	Kezdeti súlyok: \[ w_1 := 0,3 ~\text{ és }~ w_2 := -0,1. \]
+	
+	Küszöbérték: $\theta := 0,2$. 
+	Tanulási ráta: $\eta := 0,1$.
+	
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
+		\hline
+		\textbf{Epoch} & \textbf{\makecell[c]{Ite-\\ráció}} & \multicolumn{2}{c|}{\textbf{Bemenetek}} & \multicolumn{2}{c|}{\textbf{\makecell[c]{Kezdeti \\ súlyok}}}  & \textbf{\makecell[c]{Elvárt \\ kimenet}} & \textbf{\makecell[c]{Tényleges \\ kimenetek}} & \textbf{Hiba} & \multicolumn{2}{c|}{\textbf{\makecell[c]{Végleges \\ súlyok}}} \\
+		\hline
+		& $p$ & $x_1(p)$ & $x_2(p)$ & $w_1(p)$ & $w_2(p)$ & $d(p)$ & $y(p)$ & $e(p)$ & $w_1(p+1)$ & $w_2(p+1)$ \\
+		\hline
+		1 & 1 & 0 & 0 & $\textbf{0,3}$ & $\textbf{--0,1}$ &  &  &  &  &  \\
+		\hline
+		& 2 & 0 & 1 &  &  &  &  &  &  &  \\
+		\hline
+		& 3 & 1 & 0 &  &  &  &  &  &  &  \\
+		\hline
+		& 4 & 1 & 1 &  &  &  &  &  &  &  \\
+		\hline
+	\end{tabular}
+	\caption{1. lépés -- Initicializáció}
+\end{figure}
+
+\begin{figure}[h!]
+	%\centering
+	Tényleges kimenetek:
+	\begin{flalign*}
+		y(p) = y(1) = step \left[ \left( \sum\limits_{i = 1}^{m} x_i \cdot w_i \right) - \theta \right] = step \left[ \left( 0 \cdot (0,3) + 0 \cdot (-0,1) \right) - 0,2 \right] = step \left( -0,2 \right) = 0
+	\end{flalign*}
+	
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
+		\hline
+		\textbf{Epoch} & \textbf{\makecell[c]{Ite-\\ráció}} & \multicolumn{2}{c|}{\textbf{Bemenetek}} & \multicolumn{2}{c|}{\textbf{\makecell[c]{Kezdeti \\ súlyok}}}  & \textbf{\makecell[c]{Elvárt \\ kimenet}} & \textbf{\makecell[c]{Tényleges \\ kimenetek}} & \textbf{Hiba} & \multicolumn{2}{c|}{\textbf{\makecell[c]{Végleges \\ súlyok}}} \\
+		\hline
+		& $p$ & $x_1(p)$ & $x_2(p)$ & $w_1(p)$ & $w_2(p)$ & $d(p)$ & $y(p)$ & $e(p)$ & $w_1(p+1)$ & $w_2(p+1)$ \\
+		\hline
+		1 & 1 & 0 & 0 & $0,3$ & $-0,1$ &  & \textbf{0} &  &  &  \\
+		\hline
+		& 2 & 0 & 1 &  &  &  &  &  &  &  \\
+		\hline
+		& 3 & 1 & 0 &  &  &  &  &  &  &  \\
+		\hline
+		& 4 & 1 & 1 &  &  &  &  &  &  &  \\
+		\hline
+	\end{tabular}
+	\caption{2. lépés -- Aktiváció}
+\end{figure}
+
+\begin{figure}[h!]
+	%\centering
+	Az ``és'' műveletre a 00 bemenetekre 0 lesz az eredmény.
+	
+	Hiba:
+	\begin{flalign*}
+		e(p) = e(1) = d(1) - y(1) = 0-0 = 0.
+	\end{flalign*}
+	
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
+		\hline
+		\textbf{Epoch} & \textbf{\makecell[c]{Ite-\\ráció}} & \multicolumn{2}{c|}{\textbf{Bemenetek}} & \multicolumn{2}{c|}{\textbf{\makecell[c]{Kezdeti \\ súlyok}}}  & \textbf{\makecell[c]{Elvárt \\ kimenet}} & \textbf{\makecell[c]{Tényleges \\ kimenetek}} & \textbf{Hiba} & \multicolumn{2}{c|}{\textbf{\makecell[c]{Végleges \\ súlyok}}} \\
+		\hline
+		& $p$ & $x_1(p)$ & $x_2(p)$ & $w_1(p)$ & $w_2(p)$ & $d(p)$ & $y(p)$ & $e(p)$ & $w_1(p+1)$ & $w_2(p+1)$ \\
+		\hline
+		1 & 1 & 0 & 0 & $0,3$ & $-0,1$ & \textbf{0} & 0 & \textbf{0} &  &  \\
+		\hline
+		& 2 & 0 & 1 &  &  &  &  &  &  &  \\
+		\hline
+		& 3 & 1 & 0 &  &  &  &  &  &  &  \\
+		\hline
+		& 4 & 1 & 1 &  &  &  &  &  &  &  \\
+		\hline
+	\end{tabular}
+	\caption{3. lépés -- Súlyok tanítása (1/2)}
+\end{figure}
+
+\begin{figure}[h!]
+	%\centering
+	Az új súlyok kiszámítása.
+	\begin{flalign*}
+		\Delta w_1(p) & = \Delta w_1(1) = \eta \cdot x_1(1) \cdot e(1) =  0,1 \cdot 0 \cdot 0 = 0 \\
+		\Delta w_1(p+1) & = w_1(1) + \Delta w_1(1) = 0,3 + 0 = 0,3 \\
+		\Delta w_2(p) & = \Delta w_2(1) = \eta \cdot x_2(1) \cdot e(1) =  0,1 \cdot 0 \cdot 0 = 0 \\
+		\Delta w_2(p+1) & = w_2(1) + \Delta w_2(1) = (-0,1) + 0 = -0,1
+	\end{flalign*}
+	
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
+		\hline
+		\textbf{Epoch} & \textbf{\makecell[c]{Ite-\\ráció}} & \multicolumn{2}{c|}{\textbf{Bemenetek}} & \multicolumn{2}{c|}{\textbf{\makecell[c]{Kezdeti \\ súlyok}}}  & \textbf{\makecell[c]{Elvárt \\ kimenet}} & \textbf{\makecell[c]{Tényleges \\ kimenetek}} & \textbf{Hiba} & \multicolumn{2}{c|}{\textbf{\makecell[c]{Végleges \\ súlyok}}} \\
+		\hline
+		& $p$ & $x_1(p)$ & $x_2(p)$ & $w_1(p)$ & $w_2(p)$ & $d(p)$ & $y(p)$ & $e(p)$ & $w_1(p+1)$ & $w_2(p+1)$ \\
+		\hline
+		1 & 1 & 0 & 0 & $0,3$ & $-0,1$ & 0 & 0 & 0 & $\textbf{0,3}$ & $\textbf{--0,1}$  \\
+		\hline
+		& 2 & 0 & 1 &  &  &  &  &  &  &  \\
+		\hline
+		& 3 & 1 & 0 &  &  &  &  &  &  &  \\
+		\hline
+		& 4 & 1 & 1 &  &  &  &  &  &  &  \\
+		\hline
+	\end{tabular}
+	\caption{3. lépés -- Súlyok tanítása (2/2)}
+\end{figure}
+
+\begin{figure}[h!]
+	%\centering
+	Innentől $p := p + 1 = 2$. Ismételjük a 2-3-4. lépéseket, ameddig el nem kezd konvergálni.
+	
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
+		\hline
+		\textbf{Epoch} & \textbf{\makecell[c]{Ite-\\ráció}} & \multicolumn{2}{c|}{\textbf{Bemenetek}} & \multicolumn{2}{c|}{\textbf{\makecell[c]{Kezdeti \\ súlyok}}}  & \textbf{\makecell[c]{Elvárt \\ kimenet}} & \textbf{\makecell[c]{Tényleges \\ kimenetek}} & \textbf{Hiba} & \multicolumn{2}{c|}{\textbf{\makecell[c]{Végleges \\ súlyok}}} \\
+		\hline
+		& $p$ & $x_1(p)$ & $x_2(p)$ & $w_1(p)$ & $w_2(p)$ & $d(p)$ & $y(p)$ & $e(p)$ & $w_1(p+1)$ & $w_2(p+1)$ \\
+		\hline
+		1 & 1 & 0 & 0 & $0,3$ & $-0,1$ & 0 & 0 & 0 & ${0,3}$ & ${-0,1}$  \\
+		\hline
+		& 2 & 0 & 1 & $\textbf{0,3}$ & $\textbf{--0,1}$ &  &  &  &  &  \\
+		\hline
+		& 3 & 1 & 0 &  &  &  &  &  &  &  \\
+		\hline
+		& 4 & 1 & 1 &  &  &  &  &  &  &  \\
+		\hline
+	\end{tabular}
+	\caption{4. lépés -- Iteráció}
+\end{figure}
+
+\begin{figure}[h!]	
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
+		\hline
+		\textbf{Epoch} & \textbf{\makecell[c]{Ite-\\ráció}} & \multicolumn{2}{c|}{\textbf{Bemenetek}} & \multicolumn{2}{c|}{\textbf{\makecell[c]{Kezdeti \\ súlyok}}}  & \textbf{\makecell[c]{Elvárt \\ kimenet}} & \textbf{\makecell[c]{Tényleges \\ kimenetek}} & \textbf{Hiba} & \multicolumn{2}{c|}{\textbf{\makecell[c]{Végleges \\ súlyok}}} \\
+		\hline
+		& $p$ & $x_1(p)$ & $x_2(p)$ & $w_1(p)$ & $w_2(p)$ & $d(p)$ & $y(p)$ & $e(p)$ & $w_1(p+1)$ & $w_2(p+1)$ \\
+		\hline
+		1 & 1 & 0 & 0 & $0,3$ & $-0,1$ & 0 & 0 & 0 & ${0,3}$ & ${-0,1}$  \\
+		\hline
+		& 2 & 0 & 1 & ${0,3}$ & ${-0,1}$ & 0 & 0 & 0 & $0,3$ & $-0,1$  \\
+		\hline
+		& 3 & 1 & 0 & $0,3$ & $-0,1$ & 0 & 1 & $-1$ & $0,2$ & $-0,1$ \\
+		\hline
+		& 4 & 1 & 1 & $0,2$ & $-0,1$ & 1 & 0 & 1 & $0,3$ & $0,0$ \\
+		\hline
+	\end{tabular}
+	\caption{1. epoch végeredménye}
+\end{figure}
+
+\textbf{\textit{Megjegyzés}}. Az ``\textit{epoch}'' kifejezés szó szerint \textit{kor}t, \textit{korszak}ot jelent. Szinonimaként a GT témakörében még generációnak (\textit{generation}) is nevezik, leginkább az evolúciós algoritmusok esetében. Arra utal, hogy ``hanyadik generációs fejlettségben'' van az adathalmaz. Nem vagyok benne biztos, hogyan szokták  lefordítani a magyar szakirodalomban, így inkább az angol megfelelőjét választottam.
+
+\clearpage
+
+\begin{figure}[h]	
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
+		\hline
+		\textbf{Epoch} & \textbf{\makecell[c]{Ite-\\ráció}} & \multicolumn{2}{c|}{\textbf{Bemenetek}} & \multicolumn{2}{c|}{\textbf{\makecell[c]{Kezdeti \\ súlyok}}}  & \textbf{\makecell[c]{Elvárt \\ kimenet}} & \textbf{\makecell[c]{Tényleges \\ kimenetek}} & \textbf{Hiba} & \multicolumn{2}{c|}{\textbf{\makecell[c]{Végleges \\ súlyok}}} \\
+		\hline
+		& $p$ & $x_1(p)$ & $x_2(p)$ & $w_1(p)$ & $w_2(p)$ & $d(p)$ & $y(p)$ & $e(p)$ & $w_1(p+1)$ & $w_2(p+1)$ \\
+		\hline
+		2 & 5 & 0 & 0 & $0,3$ & $0,0$ & 0 & 0 & 0 & ${0,3}$ & ${0,0}$  \\
+		\hline
+		& 6 & 0 & 1 & ${0,3}$ & ${0,0}$ & 0 & 0 & 0 & $0,3$ & $0,0$  \\
+		\hline
+		& 7 & 1 & 0 & $0,3$ & $0,0$ & 0 & 1 & $-1$ & $0,2$ & $0,0$ \\
+		\hline
+		& 8 & 1 & 1 & $0,2$ & $0,0$ & 1 & 1 & 0 & $0,2$ & $0,0$ \\
+		\hline
+	\end{tabular}
+	\caption{2. epoch végeredménye}
+\end{figure}
+
+\begin{figure}[h]	
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
+		\hline
+		\textbf{Epoch} & \textbf{\makecell[c]{Ite-\\ráció}} & \multicolumn{2}{c|}{\textbf{Bemenetek}} & \multicolumn{2}{c|}{\textbf{\makecell[c]{Kezdeti \\ súlyok}}}  & \textbf{\makecell[c]{Elvárt \\ kimenet}} & \textbf{\makecell[c]{Tényleges \\ kimenetek}} & \textbf{Hiba} & \multicolumn{2}{c|}{\textbf{\makecell[c]{Végleges \\ súlyok}}} \\
+		\hline
+		& $p$ & $x_1(p)$ & $x_2(p)$ & $w_1(p)$ & $w_2(p)$ & $d(p)$ & $y(p)$ & $e(p)$ & $w_1(p+1)$ & $w_2(p+1)$ \\
+		\hline
+		5 & 17 & 0 & 0 & $0,1$ & $0,1$ & 0 & 0 & \textbf{0} & $0,1$ & $0,1$  \\
+		\hline
+		& 18 & 0 & 1 & $0,1$ & $0,1$ & 0 & 0 & \textbf{0} & $0,1$ & $0,1$  \\
+		\hline
+		& 19 & 1 & 0 & $0,1$ & $0,1$ & 0 & 0 & \textbf{0} & $0,1$ & $0,1$ \\
+		\hline
+		& 20 & 1 & 1 & $0,1$ & $0,1$ & 1 & 1 & \textbf{0} & $0,1$ & $0,1$ \\
+		\hline
+	\end{tabular}
+	\caption{5. epoch végeredménye}
+\end{figure}
+
+\begin{itemize}
+	\item Ilyen feladat szerepelhet a vizsgán!
+	\item Bebizonyították, hogy ezzel az algoritmussal bármely kétosztályosan szeparálható feladatra adható egy szétválasztó hipersík (ami két osztály esetén egy egyenes).
+	\item A konvergencia gyorsasága sok mindentől függ: a sorrendtől, a küszöbértékektől (egyes $\theta$ értékekre jobban konvergál), stb.
+	\item A back-propagattion algoritmussal több perceptront összerakhatnak hálózatba
+\end{itemize}
+
+~\\
+
+\begin{footnotesize}
+	\setlength{\stmheight}{14pt}
+	
+	A következő struktogram csak vázlatosan szemlélteti az algoritmust. Feltételezzük, hogy az egyes paraméterek, mint az $epochs : \mathbb{N}^+$, $\theta : [-0.5, 0.5]$ és $\eta : \mathbb{R}$ változók globálisak. A pontos implementációs részleteket (globális változók, helyes inicializáció, függvényparaméter-átadás érték, cím vagy referencia szerint, stb.) az Olvasóra bízzuk.
+	
+	\begin{minipage}{0.7\linewidth}
+		\begin{stuki*}{Perceptron$\left( x / 1 : \mathbb{R}[n \times m], ~ d/1 : \mathbb{R}[n] \right) : \mathbb{R}[n]$}
+			\stm{w / 1 := \textbf{ new } \mathbb{R}[n \times m]}
+			\stm{y/1, ~ e/1 := \textbf{ new } \mathbb{R}[n]}
+			\stm*{// step 1: initialisation}
+			\begin{WHILE}{1}{\stm{i := 1 \textbf{ to } m}}
+				\stm{w[1, i] := \text{random}(-0.5, 0.5) ~~ \text{// $[-0.5, 0.5]$}}
+			\end{WHILE}
+			\stm{c := 1 ~ \text{// countdown for the number of epochs}}
+			\begin{WHILE}{7}{\stm{c \leq epochs \land \neg \text{IsErrorFree}(e)}}
+				\begin{WHILE}{5}{\stm{p := 1 \textbf{ to } n}}
+					\stm{y[p] := \Phi(x, w, p) ~~ \text{// step 2: activation}}
+					\stm{e[p] := d[p] - y[p] ~~ \text{// step 3: weight training}}
+					\begin{WHILE}{2}{\stm{i := 1 \textbf{ to } m}}
+						\stm{\Delta w_i (p) := \eta \cdot x[p, i] \cdot e[p]}
+						\stm{w[((p + 1) \% m) + 1, i] := w[p, i] + \Delta w_i (p)}
+					\end{WHILE}
+				\end{WHILE}
+				\stm{c := c + 1}
+			\end{WHILE}
+			\stm{\textbf{delete } w, e; ~ \textbf{return } y}
+		\end{stuki*}
+	\end{minipage}
+	\begin{minipage}{0.3\linewidth}
+		\begin{stuki*}[5cm]{$\Phi(x / 1, w/1 : \mathbb{R}[n \times m], ~ p : \mathbb{N}^+ )$}
+			\stm{s := 0}
+			\begin{WHILE}{1}{\stm{i := 1 \textbf{ to } m}}
+				\stm{s := s + (x[p, i] \cdot w[p, i])}
+			\end{WHILE}
+			\stm{s := s - \theta}
+			\stm{\textbf{return } \text{step}(s)}
+		\end{stuki*}
+		
+		~\\
+		
+		\begin{stuki*}[5cm]{IsErrorFree$(e / 1 : \mathbb{R}[n]) : \mathbb{B}$}
+			\stm{b := true}
+			\begin{WHILE}{1}{\stm{i := 1 \textbf{ to } n}}
+				\stm{b := b \land (e[i] = 0)}
+			\end{WHILE}
+			\stm{\textbf{return } b}
+		\end{stuki*}
+	\end{minipage}
+\end{footnotesize}
+
+\newpage
+
+\section{Etikai és jogi kérdések az MI területén}
+
+\subsection{Az MI eredményei és nem kívánt következményei}
+
+\begin{itemize}
+	\item az MI létrejöttének elsődleges motivációja az emberek mindennapjainak könnyebbé, kényelmesebbé tétele
+	\begin{itemize}
+		\item technológiai áttörések (pl. navigációs és GPS, stb.)
+		\item monoton feladatok automatizációja $\to$ hatékénység növelése
+		\item kutatásfejlesztésben áttörések ennek köszönhetően
+		\item (meg csomó példát lehet mondani, hamar össze tud szedni ilyeneket az ember)
+	\end{itemize}
+	\item Center for Humane Technology
+	\begin{itemize}
+		\item alapítói: Tristan Harris, Aza Raskin
+		\item mindketten az MI etikai kérdéseivel, következményeivel foglalkoznak (\textit{ethicist})
+		\item \textbf{az MI-dilemma} (\textit{the AI dilemma}): a tudományág és a technológia fejlődésének mértéke beláthatatlan mértéket ölt, így a friss innovációk olyan következményeket vonhatnak maguk után, melyekre nincs felkészülve a társadalmunk
+		\begin{itemize}
+			\item az emberi kép- és hanggenerálás hamar megérkezett, az eredményük minősége gyakran megkülönböztethetetlen a valós nyersanyagtól $\to$ a hang és kép alapú bizonyítékok elavulttá, használhatatlanná váltak az igazságszolgáltatásban
+			\item széles körben elérhetővé vált a generatív MI, emiatt felhasználhatjuk saját szolgáltatásaink (pl. rúter meghekkelésére írjunk programot), intézményeink kijátszására (pl. autoriter rezsimek manipulációja)
+			\item jogilag teljesen érintetlen, korlátozások nélküli területek, esetek
+		\end{itemize}
+		\item videók az MI-dilemmáról
+		\begin{itemize}
+			\item \url{https://www.youtube.com/watch?v=xoVJKj8lcNQ&t=203s}
+			\item \url{https://www.youtube.com/watch?v=cB0_-qKbal4&t=1163s}
+		\end{itemize}
+	\end{itemize}
+	\item egyre többen használják fel képzőművészeti célokra az eszközt
+	\begin{itemize}
+		\item MI-generálta zenei videó: \url{https://www.youtube.com/watch?v=uG8vItscFKc}
+	\end{itemize}
+\end{itemize}
+
+\subsection{Az MI és a művészet viszonya -- Thé\^atre d'opéra spatial}
+
+\begin{itemize}
+	\item 2022, Colorado State Fair: éves szépművészeti verseny
+	\item Jason Michael Allen a fotomanipulációs kategóriában nevezett egy MI-generálta képpel
+	\item a Midjourney plotformával készült; az első MI-generálta kép, ami \textbf{díjat nyert}
+	\item hatalmas közfelháborodás a sajtóban
+	\item felmerül egy csomó kérdés
+	\begin{itemize}
+		\item Művészetnek számít-e az MI által generált anyag?
+		\item A szerzői jog kit illet meg? Az utasítás (\textit{prompt}) kiadóját vagy a platformot szolgáltató céget?
+		\item El fogja venni az emberek munkáját?
+		\item Eszközként vagy veszélyes vetélytársként tekintsünk rá? ($\to$ az érem két oldala)
+	\end{itemize}
+\end{itemize}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.25]{img/05/theatre_dopera_spatial}
+	\caption{Jason Michael Allen -- Thé\^atre d'opéra spatial}
+\end{figure}
+
+\subsection{Felmerülő gondok az adatbázisa kapcsán}
+
+\begin{itemize}
+	\item generatív mechanizmus: \textbf{generátor-diszkriminátor} modell $\to$ ha ugyanazzal az adathalmazzal dolgoznak, könnyen \textbf{beszennyezhetik egymás adathalmazát} $\to$ torz eredményt kaphatunk
+	\item a GPT (\textit{generative pre-trained transformer}) a teljes internetet felhasználja, de \textbf{nem jelöli meg a forrásait}, ami alapján generálta a tartalmat (pl. szöveget) $\to$ plagizálás, másolás?
+	\begin{itemize}
+		\item a jegyzet írása idején (2023/2024/2. félév) egyes GPT modellek elkezdtek erre odafigyelni, pl. a Bing Copilot megjelöli a forrásait
+		\item kapcsolódó probléma: internetre kiengedve hamar rasszistává vált a ChatGPT $\to$ Ki a felelős érte? A cég? A termék? Kit lehet felelősségre vonni?
+	\end{itemize}
+\end{itemize}
+
+\subsection{Korábbi találkozásaink az MI-vel}
+\begin{itemize}
+	\item \underline{a technológia 3 szabálya}
+	\begin{enumerate}
+		\item Amikor feltalálunk egy úőj technológiát, az új felelősségek osztályát fogja felfedni. \\ (\textit{When you invent a new technology, you uncover a new class of responsibilities.})
+		\item Ha a technológia hatalmat ruház át, az versenyt indít. \\ (\textit{If the tech confers power, it starts a race.})
+		\item Ha nem koordináljuk, a verseny tragédiába fulladhat. \\ (\textit{If you do not coordinate, the race ends in tragedy.})
+	\end{enumerate}
+	\item \underline{első MI, amivel az ember találkozott}: \textbf{sütik a weblapokon}, \textbf{social media} (adatgyűjtés, amit ellenünk használtunk fel) $\to$ profilozás megindult, csoportra szabott reklámok 
+	\begin{center}		
+		$\downarrow$
+		
+		csomó új negatív káros hatás jelent meg, ami ránk is hatássak van \\ (doomscrolling, polarizáció, stb.)
+		
+		$\downarrow$
+		
+		adatalapú érdeklődés-fenntartás (\textit{data-based engagement maximalisation})
+	\end{center}
+	\item \underline{második találkozás az MI-vel}: 
+	%\item 2017: transzformer modell; 
+	%\item második hf: honnan tudjuk, h jó választ kapunk a chatgpt-től, ha nincs szakértelmünk a témáról?: keressünk hibát chatgpt-ben. nincs benne általános intelligencia
+	\begin{itemize}
+		\item 2017-ig \textbf{generatív MI}; megszabott területeken lehetett hozzáférni (robotika, beszédfelismerés és -szintézis, zene- és képgenerálás, stb.)
+		\item 2017-ben \textbf{transzformer modellek} megjelennek
+		\item 2017 után; nyelvfeldolgozás, \textbf{generatív nagy multimodális nyelvi modellek} (\textit{generative large language multimodal models}, GLLMM)
+	\end{itemize}
+\end{itemize}
+
+\newpage
+
+\iffalse
+\begin{itemize}
+	\item 1. hf (10 pont): pályázatot csináljunk -- Unseen places; válassunk egy tetszőleges képgenerátor programot, 10-9-8-7 pont helyezéstől függően
+	\item az emberiség nem készült fel egy ilyen erős MI használatára
+	\item generatív mechanizmus: generátor -- diszkriminátor modell (volt korábban)
+	\item más MI, ugyanaz a probléma: internetre kiengedve hamar rasszistává vált a ChatGPT $\to$ ki a felelősérte? a cég? a termék? kit lehet felelősségre vonni?
+	\item első MI, amivel az ember találkozott: sütik a weblapokon, social media (adatgyűjtés, amit ellenünk használtunk fel) $\to$ profilozás megindult, csoportra szabott reklámok $\to$ csomó új negatív káros hatás jelent meg, ami ránk is hatássak van $\to$ adatalapú engagement maximalisation
+	\item második találkozás az MI-vel: generatív MI; egészen 2017-ig megszabott területeken lehetett hozzáférni
+	\item 2017: transzformer modell; mely után $\to$ nyelvfeldolgozás, generatív nagy multimodális nyelvi modellek (generative large language multimodal models)
+	\item második hf: honnan tudjuk, h jó választ kapunk a chatgpt-től, ha nincs szakértelmünk a témáról?: keressünk hibát chatgpt-ben. nincs benne általános intelligencia
+\end{itemize}
+\fi
+
+\newpage
+
+\section{Felügyelet nélküli tanulás}
+
+\subsection{Fő különbségek a felügyelt tanulástól}
+
+\begin{itemize}
+	\item \textbf{nincsenek címkék} (néha még az adat osztályai és jellemzői sem ismertek)
+	\item \underline{tipikus feladatok}: csoportosítások, hasonlóságok-különbözőségek felismerése (klaszterezés)
+	%\item az előzőnél osztályozások vannak
+	\item \underline{stratégiák}: \textbf{klaszterezés} (\textit{clustering}) és \textbf{dimenziócsökkentés} (\textit{dimensionality reduction})
+\end{itemize}
+
+\subsection{Klaszterezés}
+
+\begin{itemize}
+	\item \underline{klasszifikáció} (felügyelt tanulás): esetén különböző típusú (címkéjű) adathalmazunk van és szabályt állít fel, ami  az adathoz hozzárendeli az osztályt
+	\item \underline{klaszterezés} (felügyelet nélküli tanulás): hasonló elemek milyen közel vannak egymáshoz, az adatok szerkezetét azonosítja
+	\item \textbf{klaszter}: adatok egy csoportja, melyre teljesül, hogy
+	\begin{itemize}
+		\item az azonos klaszterbe tartozó pontok jobban hasonlítanak egymásra, közelebb vannak egymáshoz
+		\item az eltérő klaszterekbe tartozók jelentősen eltérnek egymástól
+	\end{itemize}
+	
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[scale=0.25]{img/06/cluster}
+		\caption{Klaszterek}
+	\end{figure}
+
+	\item \underline{előnyei}: nincs szükségünk címkékre; néha nem is ismerjük az osztályokat vagy azok jellemzőit; csökkenthetjük vele az adatok számát
+	%\item sokszor az adatok egyszerűsítésére van szükség
+	\item \underline{alkalmazásai}: kép- és jelfeldolgozás, adatelemzés, piacelemzés, tartalommenedzsment
+	\item \underline{elvárások, előfeltételek}
+	\begin{itemize}
+		\item $n$ darab $p$-dimenziós adat ($x_i \in X_1 \times \cdots \times X_p$ (ahol $i \in [1..n]$))
+		\item $k$ darab \textbf{nemüres klaszter}t (\textit{részhalmazt} vagy \textit{partíciót}) határozzunk meg, melyeknek uniója megadja az alaphalmazt és páronként diszjunktak
+		\begin{flalign*}
+			\forall i \in [1..k], C_i \subseteq X &: C_i \neq \emptyset \\
+			\forall i, j \in [1..k], i \neq j &: C_i \cap C_j = \emptyset \\
+			\bigcup_{i = 1}^k C_i = X
+		\end{flalign*}
+		%\item más szóval: partíció
+	\end{itemize}
+	\item \underline{típusai}: agglomeratív klaszterezés, prototípus alapú klaszterezés (pl. $k$-közepű klaszterezés), DBSCAN
+	\item nincs univerzális megoldás, gyakran az adathalmaztól függ a megfelelő stratégia választása
+	
+	\iffalse
+	\begin{itemize}
+		\item \textbf{agglomeratív klaszterezés}: \\ $n$ darab adat $\to$ $n$ darab klaszter $\to$ távolság szerint összevonogatjuk a partíciókat \\ milyen távolságokat fogalmazhatunk meg? minimum, maximum, átlag távolság \\
+		$k$-átlag szerinti klaszterezés ($k$-means clustering algoritmus): a klasztereknek lesz egy jellemző pontja, amit klasztercentumnak nevezünk (cluster centre, vagy klasztercenter). itt a norma az euklideszi távolság lesz \[ ||x_k - v_i || = \min\limits_{j=1}^K || x_k - v_j || \] btw, a pithagorász-tételt kell használni xdddd
+		\item a klaszterezés során egy partíciómátrix jön létre
+		\item objektív függvényre lesz szükségünk... eléggé gusztustalan, nem fogom begépelni xdd
+		\item valamint átlagolunk is
+		\item optimális klaszterszám
+		\item előnyök: nagyon egyszerűen végrehajtható, leprogramozható (vizsgával klaszterezzünk a vizsgán), hatékony $\mathcal{O}(t \cdot k \cdot n)$
+		\item hátrányok: alkalmazható, ha definiáljuk az átlagot, muszáj meghatározni a $K$ klaszterek számát, vannak más távolságtechnikák, átlagszámítások, sok esetben \textbf{lokális optimumban marad} (nulla adatot tartalmazó klaszter), zajos és kirívó adatok kelezésére nem alkalmas, valamint a nem-konvek adatok felfedezésére sem alkalmas
+	\end{itemize}
+	\item van olyan algoritmus, melynél nem kell előre megadni a klaszterek számát (az előzőnél muszáj megadni)
+	\item how to define the right number of clusters?
+	\begin{itemize}
+		\item megnézzük $k=1,2,3\dots$-ra és ha plottoljuk a klasztereket, a törésvonal lesz az optimális
+	\end{itemize}
+	\item DBSCAN -- nem lesz részletesen bemutatva
+	\fi
+\end{itemize}
+
+\subsubsection{Agglomeratív klaszterezés}
+
+\begin{itemize}
+	\item angolul: SAHN = \textit{sequential agglomerative hierarchical non-overlapping clustering}
+	\item \underline{algoritmus}
+	\begin{itemize}
+		\item $n$ darab adatot $n$ különböző klaszterbe soroljuk
+		\item ezután iteratívan összevonogatjuk a két ``legközelebb állókat'' (ez lehet \textit{minimum}, \textit{maximum}, \textit{átlag távolság}, stb.)
+		\item addig folytatjuk, ameddig egy klasztert nem kapunk
+	\end{itemize}
+	\item \underline{előnyei}
+	\begin{itemize}
+		\item nem egy partíciót, hanem partíciók sorozatát hozzuk létre
+		\item nem kell előre meghatároznunk a klaszterek, partíciók számát
+	\end{itemize}
+	\item \underline{hátránya}: a legtöbb ilyen módszer 
+	
+	\item az algoritmus matematikailag precíz leírása
+	
+	\begin{enumerate}[1. lépés:]
+		\item adott $\{ x_1, \dots, x_n \} \subseteq R^p$ és $d : R^p \to \mathbb{R}$ egy távolságmetrika
+		\item kezdetben: $k_0 := n$, $\Gamma_0 := \{ C_{0,1}, \dots, C_{0, k_0} \} = \big\{ \{x_1\}, \dots, \{x_n\} \big\}$
+		\item $\forall i \in [0..(n-1)], \exists (a,b) \in \mathbb{N}\times\mathbb{N}:\min d(C_{i,a}, C_{i,b})$
+		\[ \Gamma_{i+1} := \Big( \Gamma_i \setminus \{ C_{i,a}, C_{i,b} \} \Big) \cup \{ C_{i,a} \cup C_{i,b} \} \]
+		\item kimenet: $\Gamma_0, \dots, \Gamma_{n-1}$
+	\end{enumerate}
+	
+	\iffalse
+	\item \textbf{agglomeratív klaszterezés}: \\ $n$ darab adat $\to$ $n$ darab klaszter $\to$ távolság szerint összevonogatjuk a partíciókat \\ milyen távolságokat fogalmazhatunk meg? minimum, maximum, átlag távolság \\
+	$k$-átlag szerinti klaszterezés ($k$-means clustering algoritmus): a klasztereknek lesz egy jellemző pontja, amit klasztercentumnak nevezünk (cluster centre, vagy klasztercenter). itt a norma az euklideszi távolság lesz \[ \norm{x_k - v_i} = \min\limits_{j=1}^K \norm{ x_k - v_j} \] btw, a pithagorász-tételt kell használni xdddd
+	\item a klaszterezés során egy partíciómátrix jön létre
+	\item objektív függvényre lesz szükségünk... eléggé gusztustalan, nem fogom begépelni xdd
+	\item valamint átlagolunk is
+	\item optimális klaszterszám
+	\item előnyök: nagyon egyszerűen végrehajtható, leprogramozható (vizsgával klaszterezzünk a vizsgán), hatékony $\mathcal{O}(t \cdot k \cdot n)$
+	\item hátrányok: alkalmazható, ha definiáljuk az átlagot, muszáj meghatározni a $K$ klaszterek számát, vannak más távolságtechnikák, átlagszámítások, sok esetben \textbf{lokális optimumban marad} (nulla adatot tartalmazó klaszter), zajos és kirívó adatok kelezésére nem alkalmas, valamint a nem-konvek adatok felfedezésére sem alkalmas
+	\fi
+\end{itemize}
+
+\subsubsection{Prototípus alapú klaszterezés ($k$-means clustering)}
+
+\begin{itemize}
+	\item nem az összes adat tartozhat klaszterekbe
+	\item helyette, mindegyik $C_i$ klaszterhez hozzárendelünk egy $v_i$ pontont az adattérben (ezt jellemzően a \textbf{klaszter középpontjának} hívjuk)
+	\item az egyes adatpontok abba a klaszterbe tartoznak, melynek a középpontjához áll a legközelebb: 
+	\[ \norm{x_k - v_i} = \min_{j = 1}^K \norm{x_k - v_j} \Longrightarrow x_k \in C_i. \]
+	\item a klaszterezés során egy \textbf{partíciómátrix} jön létre
+	\begin{flalign*}
+		U = \left( \begin{matrix}
+			u_{11} & \cdots & u_{1n} \\
+			\vdots & \ddots & \vdots \\
+			u_{K1} & \cdots & u_{Kn}
+		\end{matrix} \right) ~~~~~~~~
+		u_{ik} = \begin{cases}
+			1 ~~~ (x_k \in C_i) \\
+			0 ~~~ (x_k \notin C_i)
+		\end{cases}
+	\end{flalign*}
+	\item további megállapítások a partíciómátrix koordinátáiról
+	\begin{itemize}
+		\item az adathalmaz összes pontja eleme valamely $i$-edik klaszternek: $ \sum\limits_{i=1}^K u_{ik} = 1 $
+		\item nincsen üres klaszter: $ \sum\limits_{k = 1}^n u_{ik} > 0 $
+	\end{itemize}
+	\item a prototípus alapú klaszterezések egyik leggyakoribb algoritmusa:
+	\begin{center}
+		\framebox{\textbf{$k$-közepű klaszterezés} (\textit{$k$-means clustering})} 
+	\end{center}
+	\item a neve onnan jön, hogy megmondjuk, hány $K \in \mathbb{N}^+$ klaszterbe csoportosítsa a pontokat
+	\item fontos, hogy jól határozzuk meg az optimális klaszterszámot
+	\item hasonlóan iteratív folyamat, melyhez felhasználunk egy ún. \textbf{objektív függvényt}
+	\begin{center}
+		$ J_{KM}(U, V) = \sum\limits_{i = 1}^K \sum\limits_{x_k\in C_i} \norm{x_k - v_i}^2 = \sum\limits_{i = 1}^K \sum\limits_{k = 1}^n u_{ik} \cdot \norm{x_k - v_i}^2$
+		
+		$\downarrow$
+		
+		ezt a függvényt kell minimalizálnunk
+	\end{center}
+	\item a súlypontok / középpontok kiszámítása:
+	\[ v_i = \dfrac{1}{|C_i|} \cdot \sum\limits_{x_k\in C_i} x_k = \dfrac{\sum\limits_{k = 1}^n u_{ik} \cdot x_k}{\sum\limits_{k = 1}^n u_{ik}} \]
+	\item \underline{előnyök}
+	\begin{itemize}
+		\item egyszerű és könnyen implementálható
+		\item intuitív objektív függvény
+		\item relatíve hatékony: $\mathcal{O}(t \cdot k \cdot n)$
+		\begin{enumerate}[--]
+			\item $n$: pontok száma
+			\item $k$: klaszterek száma
+			\item $t$: iterációk száma
+			\item jellemzően $k, t \ll n$
+		\end{enumerate}
+	\end{itemize}
+	\item \underline{hátrányok}
+	\begin{itemize}
+		\item alkalmazható, ha definiáljuk az átlagot
+		\item muszáj meghatározni a $K$ klaszterek számát
+		\item vannak más távolságtechnikák, átlagszámítások
+		\item sok esetben \textbf{lokális optimumban marad} (pl. nulla adatot tartalmazó klaszter)
+		\item zajos és kirívó adatok kezelésére, valamint nem-konvex adatok felfedezésére sem alkalmas
+	\end{itemize}
+	\item \underline{algoritmus}
+	\begin{enumerate}[1. lépés:]
+		\item Határozzuk meg a klaszterek ($K$) számát. Legyen az adathalmaz $\{x_1, \dots, x_n\} \subseteq R^p$. Legyen továbbá $t_{max}$ a maximum iterációk száma, $\norm{\cdot}_v$ a klaszter középpontjától való távolság (norma), $\varepsilon$ pedig a küszöbérték / tolerancia.
+		\item Inicializáljuk a klaszterek középpontjait random értékekkel.
+		$ V^{(0)} \subseteq R^p $
+		\item Döntsük el az összes ($N$) pontról, melyik osztályba tartozik (a legközelebbi középpontot hozzárendeljük).
+		$ U^{(t)}(V^{(t-1)}) $
+		\item Újraszámoljuk a $K$ klaszter középpontjait úgy, hogy feltételezzük, hogy a pontok a megfelelő partícióhoz tartoznak. \\
+		Ha $\norm{V^{(t)} - V^{(t-1)}}_v \leq \varepsilon \Longrightarrow$ véget ér az eljárás.
+		\item A 3-4. lépést addig ismételjük, ameddig egyik pontnak sem változik meg a partícióba való besorolása. \\
+		A végeredmény az $U$ partíciómátrix és a $V$ középpontok lesznek.
+	\end{enumerate}
+\end{itemize}
+
+\begin{minipage}{0.5\linewidth}
+	\centering
+	\includegraphics[scale=0.1]{img/06/kmeans01}
+	
+	{1. lépés: Inicializáció}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+	\centering
+	\includegraphics[scale=0.1]{img/06/kmeans02}
+	
+	{2. lépés: Pontok hozzárendelése klaszterekhez}
+\end{minipage}
+
+~\\
+
+\begin{minipage}{0.5\linewidth}
+	\centering
+	\includegraphics[scale=0.1]{img/06/kmeans03}
+	
+	3. lépés: Középpontok újraigazítása
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+	\centering
+	\includegraphics[scale=0.1]{img/06/kmeans04}
+	
+	2. lépés ismét
+\end{minipage}
+
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.1]{img/06/kmeans05}
+	
+	{3-4. lépés (feltéve, hogy elértük a kívánt pontosságot)}
+\end{figure}
+
+\iffalse
+\begin{footnotesize}
+	\setlength{\stmheight}{14pt}
+	\begin{stuki*}{KMeans$(x : R^p[N], K : \mathbb{N}^+) : \mathbb{B}[K \cdot N] \times R^p[K]$}
+		\stm{V := \textbf{ new } R^p[K]; ~~ U := \textbf{ new } \mathbb{B}[K \cdot N]}
+		\stm{t_{max} := 0; ~~ converged := false}
+		\begin{WHILE}{1}{\stm{i := 1 \textbf{ to } K}}
+			\stm{V[i] := \text{random}_p()}
+		\end{WHILE}
+		\begin{WHILE}{5}{\stm{t \leq t_{max} \land \neg converged }}
+			\begin{WHILE}{3}{\stm{k := 1 \textbf{ to } N}}
+				\stm{\forall i \in [1..K] : U[i, k] := \norm{x[k] - V[i]}}
+			\end{WHILE}
+			\stm{t := t + 1}
+		\end{WHILE}
+		\stm{\textbf{return } (U, V)}
+	\end{stuki*}
+\end{footnotesize}
+\fi
+
+\newpage
+
+\subsubsection{DBSCAN}
+
+\begin{itemize}
+	\item angolul: \textit{Density-Based Spatial Clustering of Applications with Noise}
+	\item (nem volt róla részletesen szó)
+\end{itemize}
+
+\subsection{Dimenziócsökkentés}
+	
+\begin{itemize}
+	\item módszer: \textbf{főkomponens alapú analízis} (\textit{principal component analysis}, PCA) -- 
+	legfontosabb dimenziók megragadása
+	\item statisztikus módszerrel az \textbf{$n$-dimenziós teret $m$-dimenziósra csökkentjük} $(m < n)$
+	\begin{itemize}
+		\item azoktól szabadulunk meg, melyek a bemeneti tulajdonságokra nézve kis varianciájúak
+	\end{itemize}
+	\item \underline{előnyei}
+	\begin{itemize}
+		\item kevesebb számítási idő, kevesebb adatot kell tárolni
+		\item redundanciát csökkenti
+		\item könnyű ábrázolni
+	\end{itemize}
+	\iffalse
+	\item módszer: keressünk új tengelyeket az adathoz, keressük meg az elsődleges komponenseket
+	\begin{enumerate}
+		\item középre igazítjuk az adatot
+		\item kiszámítjuk a kovariancia-mátrixot
+		\item sajátértékek halmaza
+		\item új tulajdonságvektor
+	\end{enumerate}
+	\fi
+	\item (nem volt róla szó részletesen az előadáson)
+\end{itemize}
+
+\newpage
+
+\section{Megerősített tanulás}
+
+Angolul: \textit{reinforcement learning} (RL)
+
+\subsection{Mi az a megerősített tanulás?}
+
+\begin{itemize}
+	\item ez áll a legközelebb ahhoz, ahogyan az emberek vagy állatok tanulnak
+	\begin{itemize}
+		\item a kutya betanítása: ha ügyes volt, jutalomfalatot kap
+		\item csecsemők, babák tanulása a játszáson keresztül
+	\end{itemize}
+	\item számítógépen: megközelítés arra, hogy interakciókból tanuljon a gép egy speciális \textbf{jutalomfüggvény} segítségével (\textit{reward function})
+	\begin{center}
+		$\downarrow$ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		
+		\textbf{helyzethez akciókat rendel} $\to$ \underline{maximalizálja} az érte járó jutalmat
+	\end{center}
+	\item megoldható: próba-szerencse alapú kereséssel vagy késleltetett jutalmazással (állapotról állapotra lépegetünk)
+	\item maga a fogalom 3 különböző dolgot fed le
+	\begin{enumerate}
+		\item jelentheti magát a szóban forgó \textbf{problémát}, feladatot
+		\item jelentheti a \textbf{megoldások osztályát} (amik jól megoldják a problémát)
+		\item magát a \textbf{tudományterületet} (a feladatot és a megoldást tanulmányozza)
+	\end{enumerate}
+\end{itemize}
+
+\subsection{Háttere, ágazatai}
+
+\begin{itemize}
+	\item \underline{háttere, segítő tudományágak}
+	\begin{itemize}
+		\item az állati viselkedés pszichológiája (etológia)\footnote{Távolabbra nyúlik vissza ugyan, de Pavlov kutyái és az ún. \textit{feltételes reflex} is ideköthető.}, próba-szerencse módszerek
+		\item \textit{optimális vezérlés} (\textit{optimal control}), szenzorok, stb.
+		\item \textbf{játékelmélet} (általában diszkrét és folytonos)\footnote{A sakk ideköthető példaként.}
+	\end{itemize}
+	\item \underline{ágazatai}
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[scale=0.4]{img/07/rl_landscape}
+		\caption{A megerősített tanulás fajtái}
+	\end{figure}
+	\begin{itemize}
+		%\item (nem az összesről, csak párról lesz szó)
+		\item \underline{Modell alapú RL}: Markov döntési folyamat, dinamikus programozás, nemlineáris dinamikák
+		\item \underline{Modellmentes RL}: gradienscsökkentéses metódusok
+		\begin{enumerate}[$\to$]
+			\item \textit{off-policy}: két külön térképen dolgozunk
+			\item \textit{on-policy}: menet közben átírja a térképet
+		\end{enumerate}
+	\end{itemize}
+\end{itemize}
+
+%\newpage
+
+\subsection{Felépítése}
+
+\begin{itemize}
+	\item \textbf{ágens} (\textit{agent}): akciókat hajt végre a \textit{környezeten} $\to$ $Action :a_t$
+	\begin{itemize}
+		\item \textbf{akció} (\textit{action}): egy mozgás, amit az ágens kiválthat a környezetében\footnote{Gondolhatunk egy videojáték játékosára és a lehetséges ``műveleteire'' (fel, le, ugrás, stb.)}
+		\item \textbf{akciótér} (\textit{action space}): a lehetséges akciók halmaza $\to$ $A = \{ a_1, \dots, a_n \}$
+	\end{itemize}
+	\item \textbf{környezet} (\textit{environment}):  belőle megfigyelések (\textit{observations}) áramolnak vissza az ágensbe, új állapotot és potenciálisan jutalmat eredményezve ezzel $\to$ $Reward: r_t$, $\textit{New state}:s_{t+1}$
+	\begin{itemize}
+		\item \textbf{jutalom} (\textit{reward}): az a visszajelzés, ami az ágens akciójának eredményességét számszerűsíti
+	\end{itemize}
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[scale=0.4]{img/07/key_concepts}
+		\caption{A megerősített tanulás komponensei}
+	\end{figure}
+	\item a térképen az \textit{állapotok}, \textit{akciók} és \textit{jutalmak} együttese határozzák meg az ágens \textbf{trajektóriáját} (útvonalát);
+	pl. az ábrán az ágens trajektóriája: \[ \Big( S_{13} \to A_\text{right} \to R(+0) \Big) \longrightarrow \Big( S_{14} \to A_\text{up} \to R(+0) \Big) \longrightarrow \Big( S_{10} \to A_\text{right} \to R(+0) \Big) \longrightarrow \dots \]
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[scale=0.3]{img/07/grid00}
+		\caption{Térkép}
+	\end{figure}
+\end{itemize}
+
+\subsection{Modell alapú RL -- Markov döntési folyamat}
+
+\begin{tcolorbox}
+	\textbf{Markov döntési folyamat} (\textit{Markov decision process}, MDP): Az MDP egy \textit{diszkrét-idejű sztochasztikus}\footnote{A sztochasztikus jelentése egy példán keresztül: ha jobbra megyek, nem garantált, hogy jobbra is megyek, de nagy esély van rá.} vezérlési folyamat. 
+	
+	Egy matematikai keretrendszertnyújt a döntéshozások modellezéséhez olyan helyzetekben, ahol a kimenetelek részben véletlenszerűek és részben a döntéshozó irányítása alatt állnak.
+\end{tcolorbox}
+
+\begin{tcolorbox}
+	Az MDP \textbf{Markov-tulajdonságú}, ami annyit tesz, hogy annak a valószínűsége, hogy egy meghatározott állapotba váltsunk, kizárólag a jelenlegi állapottól és az eltelt időtől függ és független az idáig megtett állapotváltozások sorozatától.
+\end{tcolorbox}
+
+\begin{itemize}
+	\item \underline{a feladat definíciója}
+	\begin{itemize}
+		\item \textbf{Állapotok}: $S := \{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 \}$
+		\item \textbf{Modell}: $T(s, a, s') \sim \text{Pr}(s' \mid s, a)$, ahol $s'$ a rákövetkező állapotot jelöli\footnote{Ez fogalmazza meg a Markov-tulajdonságot.}
+		\item \textbf{Akciók}: $A(s)$, $A := \{ \text{up}, \text{down}, \text{left}, \text{right} \}$
+		\item \textbf{Jutalom}: $R(s)$, $R(s, a)$, $R(s, a, s')$
+	\end{itemize}
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[scale=0.3]{img/07/grid01}
+		\caption{A feladat térképe. A szürke mező falat jelent, amibe beleütközünk}
+	\end{figure}
+	%\item modell: $T(s,a,s') \sim Pr(s'|s,a)$, ahol $s'$ jelöli a successor state-et
+	\item \textbf{stratégia} (angolul \textit{policy}): az a függvényt, ami megoldja a problémát (annak definícióját), $\pi$-vel jelöljük. Az optimális stratégiát $\pi^*$-gal jelöljük
+	\item \underline{a feladat megoldása}
+	\begin{itemize}
+		\item \textbf{Stratégia} (\textit{{policy}}): $\pi : S \to A$, $\pi(s) = a$
+	\end{itemize}
+	\item a modell lehet determinisztikus vagy nemdeterminisztikus (az összegnek 1-nek kell lennie)
+	\begin{itemize}
+		\item determinisztikus példa:
+		\begin{flalign*}
+			\sum \text{Pr} = 1 \Longleftarrow
+			\begin{cases}
+				\text{Pr}(s_5 \mid s_1, a_\text{up}) = 1 \\
+				\text{Pr}(s_2 \mid s_1, a_\text{up}) = 0 
+			\end{cases}
+		\end{flalign*}
+		\item nemdeterminisztikus vagy szochasztikus példa:
+		\begin{flalign*}
+			\sum \text{Pr} = 1 \Longleftarrow
+			\begin{cases}
+				\text{Pr}(s_7 \mid s_1, a_\text{up}) = 0,8 \\
+				\text{Pr}(s_4 \mid s_1, a_\text{up}) = 0,1 \\
+				\text{Pr}(s_2 \mid s_1, a_\text{up}) = 0,1 \\
+				\text{Pr}(s_1 \mid s_1, a_\text{up}) = 0 
+			\end{cases}
+		\end{flalign*}
+		pl. 80\%-ban optimálisan viselkedek, de a maradékban meg ráhagyom a döntést a random faktorra $\to$ a szabadban \textbf{elengedjük felfedezi} a gépet
+	\end{itemize}
+	\item \underline{példa}
+	\begin{itemize}
+		\item A következő világnak az \textbf{optimális stratégiája} (\textit{optimal policy}) az alábbi térképen látható, ahol az alapértelmezett jutalom $R(s) = -0,4$. Minden lépés megtételével egy kicsivel csökken a jutalom, ezzel ösztönözzük, hogy ne maradjon egy helyben.
+		\begin{figure}[h!]
+			\centering
+			\includegraphics[scale=0.3]{img/07/grid02}
+			\caption{A feladat optimális stratégiája}
+		\end{figure}
+		\item Jelöljük ki a 3-as, 4-es, 7-es, 11-es mezőket és ezekhez rendeljünk eltérő jutalmakat.
+		\item Ha $R(s) = +2$, akkor az ágenst \textbf{felfedezésre (adatgyűjtésre) ösztönözzük}. Egy adott állapotban olyan akciót fog választani, amelyet még nem próbált ki. Emiatt nem feltétlenül azonnal fogja elérni a végső állapotot.
+		\begin{figure}[h!]
+			\centering
+			\includegraphics[scale=0.3]{img/07/grid03}
+			\caption{$R(s) = +2$}
+		\end{figure}
+		\item Azonban ha $R(s) = -2$, akkor a \textbf{jutalom növelése érdekében} olyan akciókat fog választani, amelyeket korábban már kipróbált. Viszont így is szuboptimális stratégiát kapunk.
+		\begin{figure}[h!]
+			\centering
+			\includegraphics[scale=0.3]{img/07/grid04}
+			\caption{$R(s) = -2$}
+		\end{figure}
+		\item Akárhogy is, egy egyensúlyt kell kialakítanunk a két szempont között.
+	\end{itemize}
+	\pagebreak
+	\item \textbf{teljes jutalom} (\textit{total reward}): $R_t = \sum\limits_{i = t}^\infty r_i$ $\to$ ekkora azonnali jutalmat kapunk, hogyha elérünk egy adott állapotot
+	\item \textbf{diszkontált teljes jutalom} (\textit{discounted total reward}): $R_t = \sum\limits_{i = t}^\infty \gamma^i r_i ~~~ (\gamma \in [0,1])$ \\ ($\gamma$: diszkont faktor) $\to$ 
+	\[ R_t = r_t + \gamma r_{t+1} + \gamma^2 r_{t+2} + \gamma^3 r_{t+3} + \dots \]
+	\item \underline{\textbf{$Q$-függvény}}: a jövőbeli várható értékét ragadja meg az ágensnek az $s_t$ állapotban úgy, hogy $a_t$ akcióra számít
+	\[ Q(s_t,a_t) = \mathbb{E}[R_t \mid s_t, a_t] \]
+	\item ezt felhasználva megkaphatjuk az \textbf{optimális stratégiát} (\textit{optimal policy}, $\pi^{*}$)
+	\[ \pi^*(s) = \arg \max_a Q(s, a) \]
+\end{itemize}
+
+\subsection{Modellmentes RL -- Mély RL algoritmusok}
+
+\begin{itemize}
+	\item két megközelítéssel oldhatjuk meg a feladatot
+\end{itemize}
+
+\begin{enumerate}
+	\item \underline{\textbf{Értéktanuló módszer}}: keressük meg a $Q(s,a)$-t $\to$ $a = \arg \max\limits_a Q(s,a)$
+	\begin{itemize}
+		\item példa: \textbf{mély $Q$-hálózatok} (\textit{deep $Q$ networks}, DQN)
+		\item egy neurális hálót használunk a $Q$-függvény megtanulásához, amit majd felhasználunk az optimális stratégia kikövetkeztetéséhez
+		\begin{figure}[h!]
+			\centering
+			\includegraphics[scale=0.4]{img/07/value_learning}
+			\caption{Érték tanulása az \textit{Atari} videojáték példáján keresztül}
+		\end{figure}
+		\item \underline{előnyei}
+		\begin{itemize}
+			\item előnyös, ha az akciótér diszkrét és kevés elemből áll
+		\end{itemize}
+		\item \underline{hátrányai}
+		\begin{itemize}
+			\item nem képes kezelni a folytonos akciótereket
+			\item a stratégiát determinisztikusan számítjuk ki a $Q$-függvényből a jutalom maximalizálásával, így szochasztikus stratégiákat sem képes megtanulni
+		\end{itemize}
+	\end{itemize}
+	\begin{center}
+		$\downarrow$
+		
+		a felmerülő problémákat az RL tanító algoritmusok egy új osztályával küszöbölhetjük ki \\
+		\textbf{gradienscsökkentéses módszerekkel} (\textit{policy gradient methods})
+	\end{center}
+	\pagebreak
+	\item \underline{\textbf{Stratégia-tanuló módszer}}: keressük meg a $\pi(s)$-t $\to$ a minta legyen $a \sim \pi(s)$
+	\begin{itemize}
+		\item \textbf{gradienscsökkentés} (\textit{policy gradient}): közvetlenül optimalizáljuk a $\pi(s)$ stratégiát
+		\begin{figure}[h!]
+			\centering
+			\includegraphics[scale=0.4]{img/07/policy_gradient}
+			\caption{Érték tanulása az \textit{Atari} videojáték példáján keresztül}
+		\end{figure}
+		\item kapunk egy eloszlásfüggvényt, amit paraméterezhetünk a szokásás $\mu$-vel és $\sigma^2$-tel (plusz még normalizált is) $\to$ a diszkrét esetet könnyedén átvihetjük folytonosra
+		\begin{itemize}
+			\item mivel a jelen példa diszkrét, ezért $\pi(s) \sim P(a, s) \longleftarrow \sum\limits_{a_i \in A} P(a_i \mid s) = 1$
+			\item diszkrét akciótér jelentése: ``melyik irányba kell mennem?''
+			\item folytonos akciótér jelentése: ``milyen gyorsan kell mennem?''
+		\end{itemize}
+		\item előnyös megoldás, ugyanis könnyen írhtaunk hozzá \textbf{szimulációt}
+		\item tipikus példa: \textbf{önvezető autó}
+		\begin{itemize}
+			\item \underline{algoritmus}
+			\begin{enumerate}
+				\item Inicializáljuk az ágenst.
+				\item Addig futtatjuk a stratégiát, amíg nem terminál.
+				\item Rögzítsük a az összes állapotot, akciót, jutalmat.
+				\item Csökkentsük azon akciók valószínűségét, melyek alacsony jutalmat eredményeztek.
+				\item Növeljük azon akciók valószínűségét, melyek magas jutalmat eredményeztek.
+				
+				\begin{footnotesize}
+					A 4-5. lépésben a veszteséget így számíthatjuk ki: $loss = -\log P(a_t \mid s_t) \cdot R_t$.
+					
+					Gradienscsökkentés: $w' = w - \triangledown loss = w + \triangledown \log P(a_t \mid s_t) \cdot R_t$
+				\end{footnotesize}
+				
+				\item Ismétlés.
+			\end{enumerate}
+		\end{itemize}
+	\end{itemize}
+	
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[scale=0.3]{img/07/self_driving_car}
+		\caption{Önvezető autó gradienscsökkentéssel}
+	\end{figure}
+	
+\end{enumerate}
+
+\pagebreak
+
+
+\section{Biológiai alapú MI megoldások}
+
+\subsection{Inspiráció, motiváció}
+
+\begin{itemize}
+	\item agy, evolúció(természetes kiválasztódás), rajintelligencia
+	\item swarm intelligence
+	\item egyedül elég buta, viszont együttesen a problémamegodlási képességük erős
+	\item mérnöki szempontból izgalmasak, mely kedvező tulajdonságai vannak
+	\item nagy létszám esetén sorozatgyártott, egyszerűen összeszerelhető, olcsók, tök egyformák
+	\item nincs főnökük \textit{per se} (a királynő valójában csak egy elcseszett szülőgép, különösebben leszarja a boj életét)
+	\item másik tul: nem kommunikálnak (emberi értéelmben), nincs értekezlet, számonkérés, ÖNSZERVEZŐDŐ módon működek $\to$ 
+	\item kellemesen függ a viselkedés a dolgozók számától $\to$ graceful degradation (méltóságteljesen csökken a teljesítmény); azaz ha meghal a boj fele, akkor fele olyan hatékonyak lesznek, nem fognak ilyen hülyeségekkel foglalkozni, mint hogy gyászoljanak, stb $\to$ alkalmazkodnak a környezethez; robosztusság
+\end{itemize}
+
+\subsection{Rajintelligencia -- példák, motivációk}
+
+\begin{itemize}
+	\item Louis Rosenberg -- Unanimous AI
+	\item a méhek az esetek 80\%-ában optimális helyet választanak rajon belül
+	\item táncikálnak / kommunikálnak a levegőben : sok dimenzió szerint is optimalizálhatnak (úgy tűnik)
+	\item etológusok adtak egy szigorú algoritmust, ami leírja a mozgásukat és az infósok bebizonyították, h megoldja a feladatot
+	\item minél izgatottabb a méh / jobban jelzi, h menjenek oda a többiek, annál izgágábban táncolnak $\to$ gyűjt követőket, elviszi őket az új hejre $\to$ toboroznak még méheket 
+	\item minél többször megy egy hejre vki, annál kevésbé lelkes (ráun xdd)
+	\item mechanizmus a végén: ha bizonyos \%-nál többen jönnek egy helyre $\to$ sípolással leállítja a többit és ...
+\end{itemize}
+
+\subsection{Térbeli csoportosítás -- spacial clustering}
+
+\begin{itemize}
+	\item hangyáknál cemetary organisation -- egy helyre, kupacba rendezi az objektumokat (morzsa, golyó, pete, bigyó)
+	\item erre is van egy egyszerűen leírható algoritmus, módszer
+	\item két dimenziós rács, a hangyák véletlenszerűen közlekednek
+	\item ahogy mennek, érzékelik, h mi van a környezetükben
+	\item valamennyi memóriával rendelkeznek, h megnézzek, melyikből volt több idáig (piros, szörge)
+	\item ha outliert találnak, az t áthelyezik a megelelő helyre
+	\item lokális megfigyelés alapján optimalizáció
+	\item egyszerű, de nagyon jól működik
+\end{itemize}
+
+
+\subsection{Legrövidebb utak}
+
+\begin{itemize}
+	%\item algo2?
+	\item állítás: hangyák tudnnak legrövidebb utat keresni két pont között
+	\item nagyjából egyenes vonalban, de EGYMÁST KÖVETVE közlekednek
+	\item közelíése a legrövidebb utak problémájának
+	\item sztochasztikusan legrövidebb (nagyobb a valószínűsége, h rövidebb lesz,mintsem, h hosszabb)
+	\item a) találjunk kaját b) ha találtunk, leghatékonyabb aknázzuk ki (legközelebbi) c) legrövidebb úton szállítsul el
+	\item megfigyelések: ha van választási lehetőség pathból, egyirányban a rövidebbet választják; akadályt raktak a legrövidebb útba aszimmetrikusan $\to$ a rövidebb úton kerülik ki
+	\item erre is adtak matematikai modellt az etológusok, majd bebizonyították a matekosok, h valóban megoldja a legrövidebb utak problémáját
+	\item megoldás: feromonok (vmi, ami a fajtársakra hat -- itt, élelem megtalálását segíti) $\to$ nem egymással, hanem az illatnymokkkal kommunikálnak
+	\item kétféle feromon: 1) ha keresi az élelmiszerforrást; 2) megvan a forrás és vissza akarja juttani a fészekbe
+	\item a hazafele tartó olyat áraszt ki, amelyik mutatja, honnan hozta a kaját
+	\item ILLÉKONY ANYAGOKRÜÓL VAN SZÓ
+	\item illékony: terjed, eloszlik, de egyre gyengébb is lesz
+	\item arra mennek,ahol a legerősebbnek érzékelik, de ezt sztochasizikusan (tehát nagyobb valószínűségű lesz az erősebb, de sosem biztos esemény) $\to$ viszont ameddig járkálnak az útvonalon, addig erős lesz a feromon (lasabban illik el); szóval a rövidebb útvonalat könnyebb megerősíteni, mint a hosszabbat;
+	\item modellezhető 2d rácson
+	\item erre alkodtak absztrakt optimalizációs módszert (gráfokra értelmezett) $\to$ sok probléma megoldható vele
+	\item marco dorigo
+\end{itemize}
+
+\newpage
+
+\section{Evolúciós algoritmusok}
+
+\subsection{Motiváció}
+
+\begin{itemize}
+	\item ha már MI, érdemes a TI-t (terészetes intelligencia) is tanulmányozni
+	\item utánozzuk le az evolúciót
+	\item fontos jelenség a tanulás $\to$ másoljuk le ezt
+	\item további fontos fogalmak: versenyzés, reprodukció, raj(zás), kommunikáció -- motivációként szolgálhatnak; ennek mesterséges létrehozása
+\end{itemize}
+
+\subsection{Háttere, közös jellemzők}
+
+\begin{itemize}
+	\item bizonyos tanulásoknál a kiértékelések után tudunk változást létrehozni
+	\item szemben az evolúciónál, a változások értékelődnek ki; melyből a jók élnek túl (evolúció = változások eredménye)
+	\item ki él túl? aki a legjobban adaptálódik a környezethez
+	\item keresési vagy tanulási problémák $\to$ megofalmazhatók optimalizációs feladatokként
+	\item leegyszerűsíthetjük az optimalizációra a problémát
+	\item megközelítések: determinisztikus (hegymászó algoritmus, analízis alapú deriválgatós faszságok); szochasztikus (véletlenkeresés, klasszikus szimulált lehűtés, evolúciós algoritmusok)
+	\item klasszikus optimalizáció lokális optimalizációt hajt végre $\to$ találjuk meg ebből a globális optimumot
+	\item egyedekbe kódoljuk be az optim. feladatot $\to$ ezek változnak az idő függvényében $\to$ egyre jobb megoldást adnak az adatoptimalizációs feladatra
+	\item '50-es, '60-as évekre nyúlik vissza a gondolat
+	\item ágai, iskolái: evolúciósprogramozás, ..., vmi nszk-s bigyó
+	\item fogalmak: gén, allén, egyed, genotípus, fenotípus, poluláció,
+	\item szétszórjuk az egyedeket (lehet sokdimenziós vektor) véletlenszerűen; bizonyos változások segítségével generációról generációra fejlődik az operáció $\to$ a globális optimum felé kezd sűsűrödni a populáció
+\end{itemize}
+
+\subsection{Genetikus algoritmusok}
+
+\begin{itemize}
+	\item 3 operátor. keresztezés, mutáció, szelekció
+	\item minden egyedhez hozzárendelhetünk egy fitnessz értéket (jobb egyedeknek nagyobb szelekciós valószínűség)
+	\item egyed: megoldása az adott problémára
+	\item fitnesszérték: mennyire jó az adott egyed
+	\item szekelciós módszerek: rulett-kerék alapú szelekció
+	\item keresztezés: lehet bináris, intédzser, stb a kódolása $\to$ két szülőegyedet kiválasztunk, váletlenszerűen levágjuk  őket, majd a két szülő két gyekreket kapunk a szeletek kereszteződéséből (konkatenáció)
+	\item mutáció: (pl. véletlenül megváltoztatunk egy bitet)
+	\item példa: $f(x) := x^2$ $(x \in \{ 0, 1, \dots, 30, 31 \}) =: I$, így $\max\limits_{x \in I} f(x)$ $\to$ 5-biten eltárolhatunk 32 számot (genotípus), fenotípusa ennek a bináris számnak a decimális alakja; populáció legyen 4.
+	\item actual count: kiválasztások száma (ha 0, akkor az adott egyed kihalt)
+	\item bizonyítható, hogy a határérték az optimum felé tart
+	\item alternatív változatai: $n$-pontos keresztezés, uniformis keresztezés (maszksztringet definiálunk az érmefeldobásra, ha fej, cerélünk, ha írás, nem)
+	\item ezt az ötletet viszi tobább: genetikus programok, genetikus programozás
+	\item fákon ($\to$ valójában programok, kifejezésfák) hajtják végre a műveleteket
+	\item egy fa leír egy képletet (pl. fonya, yaaay)
+	\item a fákon (ahogy korábban stringeken) hajtjuk végre az evolúciós algoritmust
+	\item tekinthetjük úgy, hogy a fa a program és ezt optimalizáljuk (see: reverse Polish notation, prefix notation)
+	\item függvény-node-ok : amik nem lehetnek levelek (tehát nemlevél csomópontok) $\{+,-,\cdot,/,\%,IF\}$
+	\item  a többi meg szám
+	\item mutáció: kiválasztunk egy függvénycsomópontot és rgy váletlenszerű részfára cseréljük, vagy a levelet cseréli lege ygelőre definiált levélsúcsból
+	\item keresztezés: kicseréli a részfákat
+	\item a példa felügyelt tanulásos minta
+\end{itemize}
+
+\newpage
+
+\section{Rajintelligencia}
+
+Ez a másik fajta evolúciós MI. Önállónak tekinthetjük akár, de van köze az előbbihez.
+
+\subsection{Bevezetés, motiváció}
+
+\begin{itemize}
+	\item biológia... mint az előző előadáson
+	\item korábban szinte kizárólag matematikai megközelítéssel kutatták az MI-t
+	\item ez eltolódott a biológia általi inspiráció felé
+	\item kevésbé esett róla szó: kollektív intelligencia, egyedek közti kommunikáció
+	\item stigmechia
+	\item rajintelligencia
+	\begin{itemize}
+		\item keresés és MI feladat megfogalmazható optimalizáció formájában
+		\item optimalizációs kritérium (felügyelet nélküli)
+		\item rendszerek együttműködése optimalizációt hajt végre basically
+		\item példák: madarak, halak, hangyák, méhek, stb.
+	\end{itemize}
+\end{itemize}
+
+\subsection{Particle swarm optimisation (részecske raj optimalizáció)}
+
+\begin{itemize}
+	\item '90-es évek közepében jelent meg, azóta meg rendkívül dinamikusan fejlődő terület
+	\item ágens, részecske; folytonos vektorként képzeljük el őket; valamilyen műveletet végeznek (pl erpülnek)
+	\item pbesz: minden részecskére vontakozik, personal best, általa talált legjobb helyszín a repülés során
+	\item gbest: globális legjobb
+	\item ezek vezérlik az egyes részecskék repülését
+	\item példa: $k$-adik iterációban a részecske eddigi legjobb és a raj eddigi legjobbja
+	\[ ~~~~~~ (gbest)^k \]
+	\[ s^k ~~~ (pbest)^k \]
+	\item tegyük fel, h aott van a $pbest^k$ értéke
+	\item $v^k$ a sebességvektora a részecskének
+	\item a pbest és a gbest az, amik \textbf{kitérítik a vektor irányát}
+	\item távolság a pbest és az $s$ között: $d^{pbest^k}$
+	\item ugyanez a gbest irányában is
+	\item eredőjét számíthatjuk a kettőnek $\to$ $v^{k+1}$ megkaojuk az új sebességet, vektort
+	\item nagyon hatékony, egész egyszerű
+	\item meghatározzuk a $\Delta v^k$-t, súlyozzuk ezeket (akár véletlenszerűséget is bevihetünk a súlyokba)
+	\item $w_1 = c_1 \cdot rand()$ és $w_2 = c_2 \cdot rand()$ $\to$ random generátor
+	\item pozíciót és sebességet összeadhatunk a fizikában? ... végülis igen, mert diszkrét lépések vannak
+	\item yaaay, kapunk stukiiiit... csak szövegeset
+	\item véletlenszerűen létrehozzuk az ágenseket / részecskéket / egyedeket $\to$ iterációk elteltével elkezdenek sűrűsödni egy adott pontban
+	\item szokták versenyeztetni az ilyen függvényeket, benchmarkok
+\end{itemize}
+
+\subsection{Simplified Swarm Optmisation}
+
+\begin{itemize}
+	\item egyed = vektorok; $x_{ij}^{t+1}$: $x$ $i$-edik azonosítójának $j$-edik koordinátája a $(t+1)$-edik iterációban
+	\item négy eset, más-más valószínűséggel válastjuk, melyiket választjuk ($\rho \in [0,1)$)
+	\item ez is egyszerű, hatékony
+\end{itemize}
+
+\subsection{Szentjánosbogár algoritmus (firefly algorithm)}
+
+\begin{itemize}
+	\item \#define firefly
+	\item mire használják a világításukat? $\to$ párzás, figyelmeztetési mechanizmus, áldozatok becserkészése
+	\item fényintenzitást fogjuk használni a zalgoritmusban
+	\item arányos lesz ez az attraktivitással, ami meg a távolsággal lesz fordítottan arányos
+	\item $I_0$ : konstans érték, be van szorozva a két paraméter közti távolsággal
+	\item mozgás: random mozgág + vonzóbb dolgok felé mozgás; egy $\alpha, \beta$ paramétert kapunk
+	\item nem érdekesek az edgecase-ek
+\end{itemize}
+
+
+\subsection{Gravitációs keresőalgoritmus}
+
+\begin{itemize}
+	\item minden egyednek van tömege; minél nagyobb a tömege, úgy vonzást számolhatunk, sebesség, stb,,, fizika
+	\item számos ilyen algoritmus
+	\item nem kell 100\%-osan követni a valóságot, elég, ha csak őegy modellt álíltunk fel
+	\item $G(t)$
+	\item erőhatás, Newton törtévnnye, gyorsulás mértéke
+	\item a $t$ az egy, mert diszkrét idő, tehát összeadhatunk sebességet és koordinátát
+	\item az összes ilyen algoritmus STRUKTÚRÁJA
+	\item paraméterezés,  kezdeti populáció, fitnessz kiértékelés, fő működési mechanizmus, megolások frissítése, majd vége
+\end{itemize}
+
+\newpage
+
+\section{Etorobotika}
+
+\textbf{Etorobotika} (\textit{ethorobotics}) = etológia (viselkedéstan) + robotika
+
+\subsection{Motiváció}
+
+\begin{itemize}
+	\item több AI működik egy szerkezetben, robotban (beszédszintézis, feltérképezés, mozgás)
+	\item cél: lényegében egy transzformer építése
+	\item Vector (Anki szüleménye) -- 4 magnyi processzor, mi, objektumdetekció, hangfelismerés, navigáció
+	\item hogyan tervezzünk olyan szociális robotokat, melyek napi szinten kapcsolatban vannak az emberrel
+	\item viselkedéselemek pótlása
+	\item érzelmeket hogyan pakoljuk bele (kezdetben macskaszerű volt)
+	\item arckifejezésekhez érzelmeket azonosítunk
+	\item mi a célja: robot integrálása emberi környezetbe, viszont nem várjatjuk el, h a környezet rendelkezzen programozói előképzettségekkel $\to$ robot viselkedése : etológia + robotika
+\end{itemize}
+
+\subsection{Etorobotika}
+
+\begin{itemize}
+	\item motorikus funkciók (felemelni vmit) $\to$ viselkedésminták kialakítása (kockát felvesz, elvisz vhova) $\to$ viselkedés (játék: megkeres kockát, el kell vinni az emberhez) $\to$ érzelmek
+	\item idegesség -- gyors, heves mozdulatok
+	\item fókuszáltság -- lassabb, koncentráltabb
+\end{itemize}
+
+\subsection{Etológiai mintánk}
+
+\begin{itemize}
+	\item KUTYÁK: jól integrálódtak, jól ismert viselkedésminták, hosszú évezredek tapasztalata
+	\item kutatási és fejlesztési folyamat
+	\begin{center}
+		etológiai kísérlet: ember--állat interakciója
+		
+		$\downarrow$
+		
+		etológiai viselkedésmodell
+		
+		$\downarrow$
+		
+		matematikai modell
+		
+		$\downarrow$
+		
+		robotvezérlés
+		
+		$\downarrow$
+		
+		etorobotikai kísérlet
+	\end{center}
+	\item lényegében egy flowchart (gagyi struktogram) írja le a viselkedését
+	\item egyszerű példa: napraforgó robot
+	\item explicit megfigyelésenek alapul $\to$ hogyan tehetjük tanulhatóvá
+\end{itemize}
+
+\subsection{Etológiai kutatási folyamat}
+
+\begin{itemize}
+	\item megfigyelések, rögzítjük
+	\item nézzük, meddig csinálják az adott viselkedést
+	\item teszt: Ainsworth-teszt: kötődés vizsgálata a kisgyerek és gondviselője között $\to$ etológusok kiterjesztették ember-kutyára $\to$ robot-ember viszonyrendszerben visszamérhető-e?
+	\begin{enumerate}
+		\item hozzászoktatás
+		\item idegen megjelenik
+		\item gazdi kimegy, első szeparáció
+		\item első visszatérés, reunió
+		\item kutya egyedül, második elkülönülés
+		\item szeparáció folytatása az idegennel
+		\item második visszatérés a gazdihoz
+	\end{enumerate}
+	\item definiáljunk ey pontosabb mérőrendszert... ezeket rootok mérésére hogyan?
+	\item amúgy ezt az előadó csinálta (wow)
+	\item nemcsak, h mit szeretnénk mérni az állaon
+	\item mit tudunk belerakni a robotba? top-down (tudjuk, h mit csináljon a robot, ezt kell megvalósítani), bottom-up (szenzorok, motorok $\to$ na, együtt mire képesek?) 
+	\item borzongások völgye (uncanny valley), emberszabádú robotoknál jelent meg
+	\item csak azért tegyünk be valamit, ha van funckiója (a roboton a realisztikus bőr nem az, mert az embernek a legnagyobb érzékszerve, de a robot nem használja)
+	\item feature matching
+\end{itemize}
+
+\subsection{Kísérletek}
+
+\begin{itemize}
+	\item Biscee (kék): felszolgáló robot, kommunikáljon a vendégekkel
+	\item Ethon (piros)
+	\item differenciált ???-vel rendelkeztek
+	\item mecanumbot, raspberry pi, jobban modellezhetők az állati mozgások, a számításígényes műveleteket kirendelhetjük egy szervernek (amin a nagy nyelvi modell van pl.)
+	\item külső megfigyelő rendszer: MoCap (CGI, motion capture system, filmekben használják)
+	\item mozgásnak leképezése, matematikai modellje
+	\item robothoz rögzített koordináta rendszer jobb választás volt, mint egy abszolót koordrend
+	\item etogrammok kitöltése, sokkal pontosabbak egy robot esetében (hatékonyabb is, mint amit az etológusok végeznek)
+\end{itemize}
+
+\newpage
+
+\section{Multiágens szimuláció és tanulás (Multi-agent simulation and learning)}
+
+Inkább érdekességként szerepel az előadásban.
+
+\subsection{Motiváció}
+
+\begin{itemize}
+	\item gyakori képzet, hogy ``egy nagy valami egy nagy dolgot végez el''
+	\item ezzel szemben ez egy többszereplős rendszer (ahogy a világ is az általában)
+	\item ``két mesterséges intelligencia beszélget\dots''
+	\item néha ügynöknek is nevezik, ám ez félreérthető
+	\item ágens: olyan szereplő, ami saját maga rendelkezik a cselekedeteiről (autonómia)
+	\item láttunk hasonlót: foraging ants (hangyák)
+	\item kooperáció vagy versenyhelyzet
+	\item szorosan kapcsolódnak játékelméleti gondolatok
+\end{itemize}
+
+\subsection{Mikro- és makroviselkedés}
+
+\begin{itemize}
+	\item többszereplős rendszereknél eme két szintet szoktuk vizsgálni: mikro (egyes szereplők) és makro (a teljes rendszerszintű működés)
+	\item felfedezhetünk érdekes, előre be nem látható következményeket a rendszer szintjeiben
+	\item ilyenek pl. az emergens tulajdonságok (megjelenő, előbújó)
+	\item individuálisan egyik egyed sem rendelkezik vele (pl. dugóval), viszont egy nagy rendszerben már megjelenhet
+	\item két féle megközelítés:
+	\item ágens-alapú szimuláció (analízis): adott pár mikroszabály az egyedek szintjén, melyek makro szinten generálnak makroviselkedést $\to$ egy eszköz vminek a megmagyarázásához
+	\item multiágens (megerősítéses) tanulás (konstrukció): kooperálni, rajzani tanulnak meg
+\end{itemize}
+
+\subsection{Ágens alapú szimuláció}
+
+\begin{itemize}
+	\item klasszikus példa: detroitban szegregáltan élnek $\to$ miért van? ... nehezen ellenőrizhető dolgokat sorakoztatunk fel; eme tesztelés nélküli véleményeket vizsgálhatjuk az alábbi módon
+	\begin{center}
+		alkotunk egy szabályrendszert, szimulációt, modellt és nézzük meg, hogy a jelenség emergál-e
+	\end{center}
+	\item funky közgazdász: mátrixot rajzolt fel, egy négyzetrács egy lahóhelyt jelent, kék és piros "családok" (vagy üres) laknak benne. időközönként megvizsgálják, hogy hány velük azonos színű lakik a szomszédukban. ez lesz a toleranciája, ha ezt megüti, akkor elköltözik
+	\item továbbra is mindenki marad a helyükön, ha 70\%-a $\to$ továbbra is előbújnak eme szegregációk
+	\item megmutatja, hogy a szegregáció egy rendkívül erős emergens jelenség
+	\item hasonlót vizsgáltak már vírusterjedést, birkanyájakat	
+\end{itemize}
+
+\subsection{Multiágens megerősített tanulás}
+
+\begin{itemize}
+	\item mi van, ha több genst szeretnék egyszerre tanítani?
+	\item cél, hogy közösen oldjanak meg egy problémát
+	\item a) vannak benne specialisták (designer, projekvezető, tesztelő, fejlesztő)
+	\item b) mindneki egyforma és közösen küzdenek a probléma megoldásáért, nincs hierarchia, csupán egymást érzékelve dolgoznak (extra: lehessen számtól független, magyarán fele annyi egyeddel is kezdhessünk valamire)
+	\item vesszük ezeket az üres agyú robotokat, megfogalmazunk nekik egy (egyszerű) feladatot (általában egymáshoz képest mozgási feladatok -- álljanak libasorba)
+	\item közlekedési lámpák vezérlése,calen
+	 szinkronizációja	
+\end{itemize}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}

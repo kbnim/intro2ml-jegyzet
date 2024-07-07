@@ -1,0 +1,67 @@
+%%%
+%%%     stukicommands.sty - Style file for LaTeX structograms, typedefinitions, class diagrams, version 1.0.
+%%%
+%%%     2018 Bereczky Péter. 
+%%%
+%%%     E-mail: peti.ber007@gmail.com
+%%%
+%%%     The latest official version of this package is available at
+%%%           http://aszt.inf.elte.hu/~asvanyi/szd
+%%%
+
+
+
+\NeedsTeXFormat{LaTeX2e}
+\def\stukicommands@@version{1.0}
+\def\stukicommands@@date{2018/04/21}
+%\ProvidesPackage{stukicommands}[\stukicommands@@date\space\stukicommands@@version\stukicommands Bereczky]
+\typeout{Struktogram parancsok\space\stukicommands@@version\space[\stukicommands@@date]}
+
+\usepackage{stmaryrd}
+
+%% sign for nullpointer
+\newcommand{\NIL}{\varobslash}
+
+%% UML-style class begin
+\newcommand{\struct}[1]{
+    \begin{tabular}{|l|}
+    \hline
+    
+         \multicolumn{1}{|c|}{\bf #1} \\
+    \hline
+}
+
+%% UML-style class ending
+\newcommand{\eoStruct}{
+    \hline
+    \end{tabular}
+}
+
+%% typedef 
+\newcommand{\typedef}[2]{
+    \begin{tabular}{|l|}
+        \hline
+        {\bf typedef} #1 {\bf #2}\\
+        \hline
+    \end{tabular}
+}
+
+%% for loop for stuki.sty
+\newcommand{\for}[3]{
+    \stm{ $for$(#1; #2; #3) }
+}
+
+%% do-while loop for stuki.sty
+\newcommand{\dowhile}[1]{
+    \stm{ $do$(#1) }
+}
+
+%% making one line comments
+\newcommand{\linecomment}[1]{
+    //#1
+}
+
+%%making multiline comments
+\newcommand{\multicomment}[1]{
+    /*#1*/
+}

@@ -1,0 +1,71 @@
+\select@language {hungarian} \contentsline {section}{\numberline {1}Mesterséges intelligencia vs. gépi tanulás -- Bevezető}{4}{section.1}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {1.1}Mi az a gépi tanulás?}{4}{subsection.1.1}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {1.2}Mióta létezik?}{4}{subsection.1.2}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {1.3}Mik a hátráltató tényezők?}{4}{subsection.1.3}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {1.4}Az MI értelmezése}{5}{subsection.1.4}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {1.5}Az MI történelme}{6}{subsection.1.5}%
+\select@language {hungarian} \contentsline {section}{\numberline {2}Napjaink MI-je -- Optimalizáció}{7}{section.2}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {2.1}Mitől optimalizáció?}{7}{subsection.2.1}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {2.2}Intelligens viselkedés}{7}{subsection.2.2}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {2.3}Mitől nehéz az optimalizáció?}{9}{subsection.2.3}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {2.4}Hogyan próbálkozhatunk?}{9}{subsection.2.4}%
+\select@language {hungarian} \contentsline {section}{\numberline {3}Felügyelt tanulás}{10}{section.3}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {3.1}Felügyelet nélküli tanulás -- visszatekintés}{10}{subsection.3.1}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {3.2}Felügyelt tanulás}{10}{subsection.3.2}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {3.3}A tanulás típusai}{10}{subsection.3.3}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {3.4}Mi az a felügyelt tanulás?}{11}{subsection.3.4}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {3.5}Problémák}{11}{subsection.3.5}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {3.6}Döntési fák}{11}{subsection.3.6}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {3.7}Regresszió}{13}{subsection.3.7}%
+\select@language {hungarian} \contentsline {section}{\numberline {4}Neurális hálózatok}{14}{section.4}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {4.1}Biológiai és mesterséges neuronok}{14}{subsection.4.1}%
+\select@language {hungarian} \contentsline {subsubsection}{\numberline {4.1.1}Biológiai neuronok}{14}{subsubsection.4.1.1}%
+\select@language {hungarian} \contentsline {subsubsection}{\numberline {4.1.2}Mesterséges neuronok}{14}{subsubsection.4.1.2}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {4.2}Egyrétegű perceptronok}{15}{subsection.4.2}%
+\select@language {hungarian} \contentsline {subsubsection}{\numberline {4.2.1}Lineáris szeparabilitás}{15}{subsubsection.4.2.1}%
+\select@language {hungarian} \contentsline {subsubsection}{\numberline {4.2.2}Logikai kapuk}{16}{subsubsection.4.2.2}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {4.3}Perceptronok tanítása}{17}{subsection.4.3}%
+\select@language {hungarian} \contentsline {section}{\numberline {5}Etikai és jogi kérdések az MI területén}{21}{section.5}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {5.1}Az MI eredményei és nem kívánt következményei}{21}{subsection.5.1}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {5.2}Az MI és a művészet viszonya -- Thé\^atre d'opéra spatial}{21}{subsection.5.2}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {5.3}Felmerülő gondok az adatbázisa kapcsán}{22}{subsection.5.3}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {5.4}Korábbi találkozásaink az MI-vel}{22}{subsection.5.4}%
+\select@language {hungarian} \contentsline {section}{\numberline {6}Felügyelet nélküli tanulás}{23}{section.6}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {6.1}Fő különbségek a felügyelt tanulástól}{23}{subsection.6.1}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {6.2}Klaszterezés}{23}{subsection.6.2}%
+\select@language {hungarian} \contentsline {subsubsection}{\numberline {6.2.1}Agglomeratív klaszterezés}{24}{subsubsection.6.2.1}%
+\select@language {hungarian} \contentsline {subsubsection}{\numberline {6.2.2}Prototípus alapú klaszterezés ($k$-means clustering)}{24}{subsubsection.6.2.2}%
+\select@language {hungarian} \contentsline {subsubsection}{\numberline {6.2.3}DBSCAN}{27}{subsubsection.6.2.3}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {6.3}Dimenziócsökkentés}{27}{subsection.6.3}%
+\select@language {hungarian} \contentsline {section}{\numberline {7}Megerősített tanulás}{28}{section.7}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {7.1}Mi az a megerősített tanulás?}{28}{subsection.7.1}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {7.2}Háttere, ágazatai}{28}{subsection.7.2}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {7.3}Felépítése}{29}{subsection.7.3}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {7.4}Modell alapú RL -- Markov döntési folyamat}{30}{subsection.7.4}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {7.5}Modellmentes RL -- Mély RL algoritmusok}{32}{subsection.7.5}%
+\select@language {hungarian} \contentsline {section}{\numberline {8}Biológiai alapú MI megoldások}{34}{section.8}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {8.1}Inspiráció, motiváció}{34}{subsection.8.1}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {8.2}Rajintelligencia -- példák, motivációk}{34}{subsection.8.2}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {8.3}Térbeli csoportosítás -- spacial clustering}{34}{subsection.8.3}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {8.4}Legrövidebb utak}{35}{subsection.8.4}%
+\select@language {hungarian} \contentsline {section}{\numberline {9}Evolúciós algoritmusok}{36}{section.9}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {9.1}Motiváció}{36}{subsection.9.1}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {9.2}Háttere, közös jellemzők}{36}{subsection.9.2}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {9.3}Genetikus algoritmusok}{36}{subsection.9.3}%
+\select@language {hungarian} \contentsline {section}{\numberline {10}Rajintelligencia}{38}{section.10}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {10.1}Bevezetés, motiváció}{38}{subsection.10.1}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {10.2}Particle swarm optimisation (részecske raj optimalizáció)}{38}{subsection.10.2}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {10.3}Simplified Swarm Optmisation}{39}{subsection.10.3}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {10.4}Szentjánosbogár algoritmus (firefly algorithm)}{39}{subsection.10.4}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {10.5}Gravitációs keresőalgoritmus}{39}{subsection.10.5}%
+\select@language {hungarian} \contentsline {section}{\numberline {11}Etorobotika}{40}{section.11}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {11.1}Motiváció}{40}{subsection.11.1}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {11.2}Etorobotika}{40}{subsection.11.2}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {11.3}Etológiai mintánk}{40}{subsection.11.3}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {11.4}Etológiai kutatási folyamat}{41}{subsection.11.4}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {11.5}Kísérletek}{41}{subsection.11.5}%
+\select@language {hungarian} \contentsline {section}{\numberline {12}Multiágens szimuláció és tanulás (Multi-agent simulation and learning)}{42}{section.12}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {12.1}Motiváció}{42}{subsection.12.1}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {12.2}Mikro- és makroviselkedés}{42}{subsection.12.2}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {12.3}Ágens alapú szimuláció}{42}{subsection.12.3}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {12.4}Multiágens megerősített tanulás}{42}{subsection.12.4}%
